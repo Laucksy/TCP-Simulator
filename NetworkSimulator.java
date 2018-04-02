@@ -9,7 +9,7 @@ public class NetworkSimulator {
    * @param args[0] file with messages
    * @param args[1] time between messages
    * @param args[2] loss probability
-   * @param args[3] curroption probability
+   * @param args[3] corruption probability
    * @param args[4] window Size
    * @param args[5] mss
    * @param args[6] Protocol (buffering or nno buffering of out of order packets)

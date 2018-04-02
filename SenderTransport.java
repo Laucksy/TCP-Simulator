@@ -8,6 +8,7 @@ public class SenderTransport {
   private Timeline tl;
   private int n;
   private int mss;
+  private int seqNum;
   private boolean bufferingPackets;
 
   public SenderTransport(NetworkLayer nl) {
@@ -16,15 +17,23 @@ public class SenderTransport {
   }
 
   public void initialize() {
+    this.n = 10;
+    this.mss = 10;
+    this.seqNum = 0;
+    this.bufferingPackets = false;
   }
 
   public void sendMessage(Message msg) {
+    Packet toSend = new Packet(msg, seqNum++, 0, 0);
+    nl.sendPacket(toSend, Event.RECEIVER);
+    tl.startTimer(2);
   }
 
   public void receiveMessage(Packet pkt) {
   }
 
   public void timerExpired() {
+    System.out.println("The timer has expired!");
   }
 
   public void setTimeLine(Timeline tl) {
@@ -35,8 +44,8 @@ public class SenderTransport {
     this.n = n;
   }
 
-  public void setMSS(int n) {
-    this.n = n;
+  public void setMSS(int m) {
+    this.mss = m;
   }
 
   public void setProtocol(int n) {
