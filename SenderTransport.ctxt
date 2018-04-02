@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.target=SenderTransport
+comment0.text=\n\ A\ class\ which\ represents\ the\ receiver\ transport\ layer\n
+comment1.params=nl
+comment1.target=SenderTransport(NetworkLayer)
+comment2.params=
+comment2.target=void\ initialize()
+comment3.params=msg
+comment3.target=void\ sendMessage(Message)
+comment4.params=pkt
+comment4.target=void\ receiveMessage(Packet)
+comment5.params=
+comment5.target=void\ timerExpired()
+comment6.params=tl
+comment6.target=void\ setTimeLine(Timeline)
+comment7.params=n
+comment7.target=void\ setWindowSize(int)
+comment8.params=n
+comment8.target=void\ setMSS(int)
+comment9.params=n
+comment9.target=void\ setProtocol(int)
+numComments=10

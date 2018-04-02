@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=SenderApplication
+comment0.text=\n\ A\ class\ which\ represents\ the\ sender's\ application.\ the\ sendMessage\ will\ be\ called\ at\ random\ times.\n
+comment1.params=messages\ nl
+comment1.target=SenderApplication(java.util.ArrayList,\ NetworkLayer)
+comment2.params=
+comment2.target=SenderTransport\ getSenderTransport()
+comment3.params=
+comment3.target=void\ sendMessage()
+numComments=4

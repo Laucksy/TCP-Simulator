@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=NetworkSimulator
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+comment1.text=\n\ Main\ method\ with\ follwing\ variables\n\ @param\ args[0]\ file\ with\ messages\n\ @param\ args[1]\ time\ between\ messages\n\ @param\ args[2]\ loss\ probability\n\ @param\ args[3]\ curroption\ probability\n\ @param\ args[4]\ window\ Size\n\ @param\ args[5]\ mss\n\ @param\ args[6]\ Protocol\ (buffering\ or\ nno\ buffering\ of\ out\ of\ order\ packets)\n\ @param\ args[7]\ Debugging\ flag\n
+comment2.params=fileName
+comment2.target=java.util.ArrayList\ readFile(java.lang.String)
+numComments=3

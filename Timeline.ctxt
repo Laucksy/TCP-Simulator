@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.target=Timeline
+comment0.text=\n\ This\ class\ represents\ the\ timeline\ of\ events\ in\ a\ priority\ queue\n
+comment1.params=time\ numOfMessages
+comment1.target=Timeline(int,\ int)
+comment1.text=\n\ A\ constructor\ to\ initialize\ variables.\n
+comment2.params=
+comment2.target=Event\ returnNextEvent()
+comment2.text=\n\ Getting\ next\ event.\ It\ it\ is\ a\ send\ event,\ and\ there\ are\ still\ messages\ that\ need\ to\ be\ sent,\ sending\ the\ next\ one.\n
+comment3.params=
+comment3.target=void\ createSendEvent()
+comment3.text=\n\ Creating\ a\ send\ event.First\ generating\ a\ random\ enumber\ using\ the\ exponential\ distribution\ with\ average\ timeBetweenSends\ and\ then\ adding\ the\ event.\n
+comment4.params=pkt\ to
+comment4.target=void\ createArriveEvent(Packet,\ int)
+comment4.text=\n\ Creating\ an\ arrive\ event.\ This\ first\ checks\ for\ the\ last\ arrival\ time\ (since\ packets\ cannot\ be\ reordered),\ and\ the\ adds\ a\ random\ number\ uniformly\ distributed\ from\ 1-9\n\ to\ calculate\ the\ time\ of\ the\ arrival\ event.\ It\ then\ adds\ the\ event\ to\ the\ queue.\n\ @param\ pkt\ packet\ that\ will\ arrive\n\ @param\ to\ who\ are\ we\ sending\ the\ packet\ to\n
+comment5.params=increment
+comment5.target=void\ startTimer(int)
+comment5.text=\n\ Starting\ timer.If\ it\ si\ already\ started\ it\ prints\ out\ an\ error\ message.\ setting\ timerPointer\ to\ point\ at\ timer\ event.\n\ @\ param\ increment\ timeout\ for\ timer\n
+comment6.params=
+comment6.target=void\ stopTimer()
+comment6.text=\n\ Kills\ timer\ and\ sets\ timerPointer\ to\ null\n
+numComments=7
