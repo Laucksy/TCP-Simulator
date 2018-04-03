@@ -13,9 +13,17 @@ public class ReceiverTransport {
   }
 
   public void initialize() {
+    this.bufferingPackets = false;
   }
 
   public void receiveMessage(Packet pkt) {
+    if (!pkt.isCorrupt()) {
+      System.out.println("Received good packet " + pkt.getSeqnum());
+      ra.receiveMessage(pkt.getMessage());
+    } else {
+      System.out.println("Received corrupt packet " + pkt.getSeqnum());
+      //TODO: Send control packet to sender saying packet is corrupt
+    }
   }
 
   public void setProtocol(int n) {

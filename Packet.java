@@ -40,10 +40,22 @@ public class Packet {
   }
 
   public void setChecksum() {
+    int cs = seqnum + acknum;
+    String message = msg.getMessage();
+    for (int i = 0; i < message.length(); i++) {
+      cs += x.charAt(i);
+    }
+    System.out.println("CHECKSUM: " + cs);
+    this.checksum = cs;
   }
 
   public boolean isCorrupt() {
-    return false;
+    int cs = seqnum + acknum;
+    String message = msg.getMessage();
+    for (int i = 0; i < message.length(); i++) {
+      cs += x.charAt(i);
+    }
+    return this.checksum == cs;
   }
 
   /**
