@@ -20,14 +20,14 @@ public class NetworkSimulator {
     Event currentEvent;
     //checking to see if enough arguments have been sent
     if(args.length < 7) {
-        System.out.println("need at least 5 arguments");
-        System.exit(1);
+      System.out.println("need at least 5 arguments");
+      System.exit(1);
     }
     //reading in file line by line. Each line will be one message
     ArrayList<String> messageArray = readFile(args[0]);
     //creating a new timeline with an average time between packets.
     Timeline tl = new Timeline(Integer.parseInt(args[1]), messageArray.size());
-    //creating a new network layer with specific loss and curroption probability.
+    //creating a new network layer with specific loss and corruption probability.
     NetworkLayer nl = new NetworkLayer(Float.parseFloat(args[2]), Float.parseFloat(args[3]), tl);
     SenderApplication sa = new SenderApplication(messageArray, nl);
     SenderTransport st = sa.getSenderTransport();
