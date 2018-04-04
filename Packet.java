@@ -11,7 +11,7 @@ public class Packet {
 
   Random ran; //random number generator
 
-  public Packet(Message msg, int seqnum, int acknum, int checksum) {
+  public Packet(Message msg, int seqnum, int acknum) {
     this.msg = msg;
     this.seqnum = seqnum;
     this.acknum = acknum;
@@ -43,7 +43,7 @@ public class Packet {
     int cs = seqnum + acknum;
     String message = msg.getMessage();
     for (int i = 0; i < message.length(); i++) {
-      cs += x.charAt(i);
+      cs += message.charAt(i);
     }
     System.out.println("CHECKSUM: " + cs);
     this.checksum = cs;
@@ -53,7 +53,7 @@ public class Packet {
     int cs = seqnum + acknum;
     String message = msg.getMessage();
     for (int i = 0; i < message.length(); i++) {
-      cs += x.charAt(i);
+      cs += message.charAt(i);
     }
     return this.checksum == cs;
   }

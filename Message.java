@@ -12,6 +12,10 @@ public class Message {
     return x;
   }
 
+  public int length() {
+    return x.length();
+  }
+
   public void corruptMessage() {
      x = String.valueOf(x.charAt(0) + 1) + x.substring(1);
   }

@@ -9,7 +9,7 @@ public class NetworkLayer {
   Timeline tl;
   Random ran; //random number generator for losing packets.
 
-  public NetworkLayer(float lp, float cp,Timeline tl) {
+  public NetworkLayer(float lp, float cp, Timeline tl) {
     lossProbability = lp;
     currProbability = cp;
     this.tl = tl;

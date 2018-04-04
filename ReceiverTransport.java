@@ -5,6 +5,7 @@ public class ReceiverTransport {
   private ReceiverApplication ra;
   private NetworkLayer nl;
   private boolean bufferingPackets;
+  private int expectedSeqnum;
 
   public ReceiverTransport(NetworkLayer nl) {
     ra = new ReceiverApplication();
@@ -14,15 +15,28 @@ public class ReceiverTransport {
 
   public void initialize() {
     this.bufferingPackets = false;
+    this.expectedSeqnum = 0;
   }
 
   public void receiveMessage(Packet pkt) {
-    if (!pkt.isCorrupt()) {
-      System.out.println("Received good packet " + pkt.getSeqnum());
+    Message msg = new Message("");
+    if (!pkt.isCorrupt() && pkt.getSeqnum() == expectedSeqnum) {
+      System.out.print("Received good packet " + pkt.getSeqnum());
       ra.receiveMessage(pkt.getMessage());
+      Packet ack = new Packet(msg, pkt.getSeqnum(), pkt.getSeqnum() + pkt.getMessage().length());
+      nl.sendPacket(ack, Event.SENDER);
+    } else if (!pkt.isCorrupt()) {
+      System.out.print("Received out of order packet " + pkt.getSeqnum());
+      if (bufferingPackets) {
+        //TODO: Add packet to buffer
+      }
+      Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
+      nl.sendPacket(ack, Event.SENDER);
     } else {
       System.out.println("Received corrupt packet " + pkt.getSeqnum());
       //TODO: Send control packet to sender saying packet is corrupt
+      Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
+      nl.sendPacket(ack, Event.SENDER);
     }
   }
 
