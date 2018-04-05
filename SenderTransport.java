@@ -1,3 +1,4 @@
+import java.time.Year;
 import java.util.ArrayList;
 
 /**
@@ -31,33 +32,66 @@ public class SenderTransport {
   }
 
   public void sendMessage(Message msg) {
+    Packet toSend;
 
-    // for (int i = 0; i < msg.byteLength(); i += mss) {
+    for (int i = 0; i < msg.byteLength(); i += mss) {
+      toSend = new Packet(
+        new Message(msg.getMessage().substring(i, i + mss > msg.byteLength() ? msg.byteLength() : i + mss)), 
+        seqnum, 
+        expectedSeqnum
+      );
+      seqnum += (i + mss) > msg.byteLength() ? (msg.byteLength() - i) : mss;
+      packets.add(toSend);
 
-    // }
-    
-
-    Packet toSend = new Packet(msg, seqnum, expectedSeqnum);
-    seqnum += msg.byteLength();
-    packets.add(toSend);
-
-    System.out.println("-------------------------");
-    System.out.println(toSend);
-
-    if (base + n >= packets.size()) {
-      System.out.println("~~~~~~~~~ Sending ~~~~~~~~~");
+      System.out.println("---------- Created Packet ----------");
       System.out.println(toSend);
-      System.out.println("\033[0;37mBASE:\t\t" + base + "\033[0m");
-
-      nl.sendPacket(toSend, Event.RECEIVER);
-      tl.startTimer(10);
-    }   
+      System.out.println("------------------------------------\n");
+    }
   }
 
   public void receiveMessage(Packet pkt) {
-    expectedSeqnum = pkt.getSeqnum() + 1;
     System.out.println("-------------------------");
     System.out.println(pkt);
+
+    if (pkt.getAcknum() > base) {
+      base = pkt.getAcknum();
+      
+      // TODO
+      // if (there are currently any not-yet-acknowledged segments)
+      //   start timer
+    }
+
+    expectedSeqnum = pkt.getSeqnum() + 1;
+
+  }
+
+  public void send () {
+    Packet tmp = packets.get(packets.size() - 1);
+    int baseIndex = 0;
+    int currentIndex = 0;
+
+    for (int i = 0; i < packets.length; i++) {
+      if (packets.get(i).getSeqnum() == base) {
+        baseIndex = i;
+      }
+
+      if (packets.get(i).getSeqnum() == tmp.getSeqnum()) {
+        currentIdex = i;
+      }
+    }
+
+    for (int i = currentIndex; i < baseIndex + n; i++) {
+      if (i < packets.size()) {
+        System.out.println("~~~~~~~~~ Sending Packet ~~~~~~~~~");
+        System.out.println(packets.get(i));
+
+        packets.get(i).setStatus(2);
+        nl.sendPacket(packets.get(i), Event.RECEIVER);
+        tl.startTimer(10);
+        System.out.println("\033[0;37mSEND BASE:\t" + base + "\033[0m");
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+      }
+    }
   }
 
   public void timerExpired() {

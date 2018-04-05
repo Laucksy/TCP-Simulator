@@ -9,4 +9,4 @@ run:
 single:
 	java NetworkSimulator ${type}.txt 1 0.1 0.1 10 10 0 1
 nolc:
-	java NetworkSimulator ${type}.txt 1 0 0 2 10 0 1
+	java NetworkSimulator ${type}.txt 1 0 0 5 10 0 1

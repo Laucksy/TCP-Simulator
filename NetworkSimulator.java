@@ -51,11 +51,11 @@ public class NetworkSimulator {
 
       if(currentEvent.getType() == Event.MESSAGESEND) {
         //if event is time to send a message, call the send message function of the sender application.
-        sa.sendMessage();
         if(DEBUG > 0) {
           System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
-          System.out.println("\033[45m\033[30mACTION\t\tSender => Receiver (at sender)\033[0m");
+          System.out.println("\033[45m\033[30mACTION\t\tSender (Application) => Sender (Transport)\033[0m");
         }
+        sa.sendMessage();
       } else if (currentEvent.getType() == Event.MESSAGEARRIVE) {
         //if event is a message arrival
         if(currentEvent.getHost() == Event.SENDER) {
