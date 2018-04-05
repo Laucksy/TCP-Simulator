@@ -24,12 +24,21 @@ public class SenderTransport {
   }
 
   public void sendMessage(Message msg) {
+
     Packet toSend = new Packet(msg, seqNum++, 0);
     nl.sendPacket(toSend, Event.RECEIVER);
     tl.startTimer(2);
+
+    System.out.println("-------------------------");
+    System.out.println("Sending message form Sender Transport Layer");
+    System.out.println(toSend);
+    System.out.println("-------------------------");
   }
 
   public void receiveMessage(Packet pkt) {
+    System.out.println("-------------------------");
+    System.out.println("Received message from Network Layer");
+    System.out.println("-------------------------");
   }
 
   public void timerExpired() {

@@ -74,4 +74,15 @@ public class Packet {
     else
       this.acknum = this.acknum + 1;
   }
+
+  public String toString () {
+    String output = "Packet:\n";
+
+    output += "\tSequence Number:\t" + seqnum + "\n";
+    output += "\tACK Number:\t\t" + acknum + "\n";
+    output += "\tChecksum:\t\t" + checksum + "\n";
+    output += "\tMessage:\t\t" + msg + "\n";
+
+    return output;
+  }
 }
