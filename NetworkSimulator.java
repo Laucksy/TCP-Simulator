@@ -54,7 +54,7 @@ public class NetworkSimulator {
         sa.sendMessage();
         if(DEBUG > 0) {
           System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
-          System.out.println("\033[0;34mACTION:\t\tMessage sent from sender to receiver\033[0m");
+          System.out.println("\033[45m\033[30mACTION\t\tSender => Receiver (at sender)\033[0m");
         }
       } else if (currentEvent.getType() == Event.MESSAGEARRIVE) {
         //if event is a message arrival
@@ -63,7 +63,7 @@ public class NetworkSimulator {
           st.receiveMessage(currentEvent.getPacket());
           if(DEBUG > 0) {
             System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
-            System.out.println("\033[0;34mACTION:\t\tMessage arriving from receiver to sender\033[0m");
+            System.out.println("\033[0;42m\033[30mACTION:\t\tSender <= Receiver\033[0m");
           }
         }
         else {
@@ -72,7 +72,7 @@ public class NetworkSimulator {
 
           if(DEBUG > 0) {
             System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
-            System.out.println("\033[0;34mACTION\t\tMessage arriving from sender to receiver\033[0m");
+            System.out.println("\033[0;43m\033[30mACTION\t\tSender => Receiver (at receiver)\033[0m");
             System.out.println("-------------------------");
           }
         }
