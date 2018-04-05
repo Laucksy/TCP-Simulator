@@ -16,6 +16,10 @@ public class Message {
     return x.length();
   }
 
+  public int byteLength() {
+    return x.getBytes().length;
+  }
+
   public void corruptMessage() {
     if (x.length() > 1) {
       x = (char) (x.charAt(0) + 1) + x.substring(1);

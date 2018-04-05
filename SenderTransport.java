@@ -8,7 +8,8 @@ public class SenderTransport {
   private Timeline tl;
   private int n;
   private int mss;
-  private int seqNum;
+  private int seqnum;
+  private int expectedSeqnum;
   private boolean bufferingPackets;
 
   public SenderTransport(NetworkLayer nl) {
@@ -19,14 +20,15 @@ public class SenderTransport {
   public void initialize() {
     this.n = 10;
     this.mss = 10;
-    this.seqNum = 0;
+    this.seqnum = 0;
+    this.expectedSeqnum = 0;
     this.bufferingPackets = false;
   }
 
   public void sendMessage(Message msg) {
 
-    Packet toSend = new Packet(msg, seqNum, 0);
-    seqNum += msg.getMessage().length();
+    Packet toSend = new Packet(msg, seqnum, expectedSeqnum);
+    seqnum += msg.byteLength();
     nl.sendPacket(toSend, Event.RECEIVER);
     tl.startTimer(10);
 
@@ -35,6 +37,7 @@ public class SenderTransport {
   }
 
   public void receiveMessage(Packet pkt) {
+    expectedSeqnum = pkt.getSeqnum() + 1;
     System.out.println("-------------------------");
     System.out.println(pkt);
   }
