@@ -12,6 +12,9 @@ public class SenderTransport {
   private int expectedSeqnum;
   private boolean bufferingPackets;
 
+  private ArrayList<Packet> packets;
+  private int base;
+
   public SenderTransport(NetworkLayer nl) {
     this.nl = nl;
     initialize();
@@ -23,17 +26,32 @@ public class SenderTransport {
     this.seqnum = 0;
     this.expectedSeqnum = 0;
     this.bufferingPackets = false;
+    this.packets = new ArrayList<Packet>();
+    this.base = 0;
   }
 
   public void sendMessage(Message msg) {
 
+    // for (int i = 0; i < msg.byteLength(); i += mss) {
+
+    // }
+    
+
     Packet toSend = new Packet(msg, seqnum, expectedSeqnum);
     seqnum += msg.byteLength();
-    nl.sendPacket(toSend, Event.RECEIVER);
-    tl.startTimer(10);
+    packets.add(toSend);
 
     System.out.println("-------------------------");
     System.out.println(toSend);
+
+    if (base + n >= packets.size()) {
+      System.out.println("~~~~~~~~~ Sending ~~~~~~~~~");
+      System.out.println(toSend);
+      System.out.println("\033[0;37mBASE:\t\t" + base + "\033[0m");
+
+      nl.sendPacket(toSend, Event.RECEIVER);
+      tl.startTimer(10);
+    }   
   }
 
   public void receiveMessage(Packet pkt) {

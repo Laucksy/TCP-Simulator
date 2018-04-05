@@ -79,10 +79,11 @@ public class Timeline {
   public void startTimer(int increment) {
     if(timerPointer != null) {
       System.out.println("\033[0;32mTIMER:\t\tON\033[0m");
-      System.out.println("-------------------------");
       return;
     }
     timerPointer = new Event(timeSoFar+increment,Event.TIMER,Event.SENDER);
+    System.out.println("\033[0;32mTIMER:\t\tSTARTING\033[0m");
+
     events.add(timerPointer);
     if(NetworkSimulator.DEBUG > 2)
       System.out.println("inserting future timer event at time: " + timeSoFar + " for " +  increment);
