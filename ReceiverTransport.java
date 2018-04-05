@@ -34,7 +34,6 @@ public class ReceiverTransport {
       nl.sendPacket(ack, Event.SENDER);
     } else {
       System.out.println("Received corrupt packet " + pkt.getSeqnum());
-      //TODO: Send control packet to sender saying packet is corrupt
       Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
       nl.sendPacket(ack, Event.SENDER);
     }

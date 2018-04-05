@@ -15,7 +15,7 @@ public class Packet {
     this.msg = msg;
     this.seqnum = seqnum;
     this.acknum = acknum;
-    this.checksum = checksum;
+    setChecksum();
     this.ran = new Random();
   }
 
@@ -45,7 +45,7 @@ public class Packet {
     for (int i = 0; i < message.length(); i++) {
       cs += message.charAt(i);
     }
-    System.out.println("CHECKSUM: " + cs);
+    // System.out.println("CHECKSUM: " + cs);
     this.checksum = cs;
   }
 
@@ -55,7 +55,7 @@ public class Packet {
     for (int i = 0; i < message.length(); i++) {
       cs += message.charAt(i);
     }
-    return this.checksum == cs;
+    return this.checksum != cs;
   }
 
   /**
