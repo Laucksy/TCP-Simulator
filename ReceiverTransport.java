@@ -1,3 +1,5 @@
+import java.util.*;
+
 /**
  * A class which represents the receiver transport layer
  */
@@ -5,6 +7,7 @@ public class ReceiverTransport {
   private ReceiverApplication ra;
   private NetworkLayer nl;
   private boolean bufferingPackets;
+  private List<Packet> buffer;
   private int expectedSeqnum;
 
   public ReceiverTransport(NetworkLayer nl) {
@@ -15,6 +18,7 @@ public class ReceiverTransport {
 
   public void initialize() {
     this.bufferingPackets = false;
+    this.buffer = new ArrayList<Packet>();
     this.expectedSeqnum = 0;
   }
 

@@ -21,4 +21,8 @@ public class Message {
       x = (char) (x.charAt(0) + 1) + x.substring(1);
     }
   }
+
+  public String toString () {
+    return x;
+  }
 }

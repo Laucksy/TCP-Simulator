@@ -53,7 +53,9 @@ public class NetworkSimulator {
         //if event is time to send a message, call the send message function of the sender application.
         sa.sendMessage();
         if(DEBUG > 0)
-          System.out.println("Message sent from sender to receiver at time " + currentEvent.getTime());
+          System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
+          System.out.println("\033[0;34mAction:\t\tMessage sent from sender to receiver\033[0m");
+
       } else if (currentEvent.getType() == Event.MESSAGEARRIVE) {
         //if event is a message arrival
         if(currentEvent.getHost() == Event.SENDER) {
@@ -71,7 +73,7 @@ public class NetworkSimulator {
       } else if (currentEvent.getType()==Event.TIMER) {
         //If event is an expired timer, call the timerExpired method in the sender transport.
         if(DEBUG > 0)
-          System.out.println("Timer expired at time " + currentEvent.getTime());
+          System.out.println("\033[0;32mTimer:\t\tEXPIRED / TIME = " + currentEvent.getTime() + "\033[0m");
 
         tl.stopTimer();
         st.timerExpired();
