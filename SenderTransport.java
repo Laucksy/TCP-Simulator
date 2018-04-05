@@ -30,9 +30,7 @@ public class SenderTransport {
     tl.startTimer(2);
 
     System.out.println("-------------------------");
-    System.out.println("Sending message form Sender Transport Layer");
     System.out.println(toSend);
-    System.out.println("-------------------------");
   }
 
   public void receiveMessage(Packet pkt) {

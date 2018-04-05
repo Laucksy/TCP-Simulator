@@ -78,7 +78,7 @@ public class Timeline {
    */
   public void startTimer(int increment) {
     if(timerPointer != null) {
-      System.out.println("Timer is already on!");
+      System.out.println("\033[0;32mTimer:\t\tON\033[0m");
       return;
     }
     timerPointer = new Event(timeSoFar+increment,Event.TIMER,Event.SENDER);
