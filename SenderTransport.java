@@ -35,12 +35,10 @@ public class SenderTransport {
 
   public void receiveMessage(Packet pkt) {
     System.out.println("-------------------------");
-    System.out.println("Received message from Network Layer");
-    System.out.println("-------------------------");
+    System.out.println(pkt);
   }
 
   public void timerExpired() {
-    System.out.println("The timer has expired!");
   }
 
   public void setTimeLine(Timeline tl) {
