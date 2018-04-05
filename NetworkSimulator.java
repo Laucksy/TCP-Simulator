@@ -52,29 +52,36 @@ public class NetworkSimulator {
       if(currentEvent.getType() == Event.MESSAGESEND) {
         //if event is time to send a message, call the send message function of the sender application.
         sa.sendMessage();
-        if(DEBUG > 0)
+        if(DEBUG > 0) {
           System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
-          System.out.println("\033[0;34mAction:\t\tMessage sent from sender to receiver\033[0m");
-
+          System.out.println("\033[0;34mACTION:\t\tMessage sent from sender to receiver\033[0m");
+        }
       } else if (currentEvent.getType() == Event.MESSAGEARRIVE) {
         //if event is a message arrival
         if(currentEvent.getHost() == Event.SENDER) {
           //if it arrives at the sender, call the get packet from the sender
-          if(DEBUG > 0)
-            System.out.println("Message arriving from receiver to sender at time " + currentEvent.getTime());
           st.receiveMessage(currentEvent.getPacket());
+          if(DEBUG > 0) {
+            System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
+            System.out.println("\033[0;34mACTION:\t\tMessage arriving from receiver to sender\033[0m");
+          }
         }
         else {
           //if it arrives at the receiver, call the get packet from the receiver
-          if(DEBUG > 0)
-            System.out.println("Message arriving from sender to receiver at time " + currentEvent.getTime());
           rt.receiveMessage(currentEvent.getPacket());
+
+          if(DEBUG > 0) {
+            System.out.println("\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m");
+            System.out.println("\033[0;34mACTION\t\tMessage arriving from sender to receiver\033[0m");
+            System.out.println("-------------------------");
+          }
         }
       } else if (currentEvent.getType()==Event.TIMER) {
         //If event is an expired timer, call the timerExpired method in the sender transport.
-        if(DEBUG > 0)
-          System.out.println("\033[0;32mTimer:\t\tEXPIRED / TIME = " + currentEvent.getTime() + "\033[0m");
-
+        if(DEBUG > 0) {
+          System.out.println("\033[0;32mTIMER:\t\tEXPIRED / TIME = " + currentEvent.getTime() + "\033[0m");
+          System.out.println("-------------------------");
+        }
         tl.stopTimer();
         st.timerExpired();
       } else if (currentEvent.getType() == Event.KILLEDTIMER) {

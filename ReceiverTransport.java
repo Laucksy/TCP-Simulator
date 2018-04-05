@@ -24,20 +24,26 @@ public class ReceiverTransport {
 
   public void receiveMessage(Packet pkt) {
     Message msg = new Message("");
+    System.out.println("-------------------------");
+    System.out.println(pkt);
+
     if (!pkt.isCorrupt() && pkt.getSeqnum() == expectedSeqnum) {
-      System.out.print("Received good packet " + pkt.getSeqnum());
+      
+      System.out.println("\033[0;32mSTATUS:\t\tGOOD\033[0m");
+
       ra.receiveMessage(pkt.getMessage());
       Packet ack = new Packet(msg, pkt.getSeqnum(), pkt.getSeqnum() + pkt.getMessage().length());
       nl.sendPacket(ack, Event.SENDER);
     } else if (!pkt.isCorrupt()) {
-      System.out.print("Received out of order packet " + pkt.getSeqnum());
+      System.out.println("\033[0;32mSTATUS:\t\tOUT OF ORDER\033[0m");
       if (bufferingPackets) {
         //TODO: Add packet to buffer
       }
       Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
       nl.sendPacket(ack, Event.SENDER);
     } else {
-      System.out.println("Received corrupt packet " + pkt.getSeqnum());
+      System.out.println("\033[0;32mSTATUS:\t\tCORRUPT\033[0m");
+
       Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
       nl.sendPacket(ack, Event.SENDER);
     }
