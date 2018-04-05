@@ -9,6 +9,7 @@ public class ReceiverTransport {
   private boolean bufferingPackets;
   private List<Packet> buffer;
   private int expectedSeqnum;
+  private int lastRead;
 
   public ReceiverTransport(NetworkLayer nl) {
     ra = new ReceiverApplication();
@@ -20,6 +21,7 @@ public class ReceiverTransport {
     this.bufferingPackets = false;
     this.buffer = new ArrayList<Packet>();
     this.expectedSeqnum = 0;
+    this.lastRead = 0;
   }
 
   public void receiveMessage(Packet pkt) {
@@ -28,16 +30,19 @@ public class ReceiverTransport {
     System.out.println(pkt);
 
     if (!pkt.isCorrupt() && pkt.getSeqnum() == expectedSeqnum) {
-      
+
       System.out.println("\033[0;32mSTATUS:\t\tGOOD\033[0m");
 
-      ra.receiveMessage(pkt.getMessage());
-      Packet ack = new Packet(msg, pkt.getSeqnum(), pkt.getSeqnum() + pkt.getMessage().length());
+      buffer.add(pkt);
+      // ra.receiveMessage(pkt.getMessage());
+      expectedSeqnum = lastReceived();
+      Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
       nl.sendPacket(ack, Event.SENDER);
     } else if (!pkt.isCorrupt()) {
       System.out.println("\033[0;32mSTATUS:\t\tOUT OF ORDER\033[0m");
       if (bufferingPackets) {
         //TODO: Add packet to buffer
+        buffer.add(pkt);
       }
       Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
       nl.sendPacket(ack, Event.SENDER);
@@ -47,6 +52,31 @@ public class ReceiverTransport {
       Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
       nl.sendPacket(ack, Event.SENDER);
     }
+  }
+
+  public void sortBuffer() {
+    Collections.sort(buffer, new Comparator<Packet>() {
+      @Override
+      public int compare(Packet p1, Packet p2) {
+        return p2.getSeqnum() - p1.getSeqnum();
+      }
+    });
+  }
+
+  public int lastReceived() {
+    sortBuffer();
+    int lastRcvd = expectedSeqnum;
+    int index = 0;
+    while (index < buffer.size() && lastRcvd == buffer.get(index).getSeqnum()) {
+      lastRcvd += buffer.get(index).getMessage().length();
+      index++;
+    }
+    return lastRcvd;
+  }
+
+  public void popBuffer() {
+    sortBuffer();
+    ra.receiveMessage(buffer.remove(0).getMessage());
   }
 
   public void setProtocol(int n) {

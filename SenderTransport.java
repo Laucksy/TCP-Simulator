@@ -25,9 +25,10 @@ public class SenderTransport {
 
   public void sendMessage(Message msg) {
 
-    Packet toSend = new Packet(msg, seqNum++, 0);
+    Packet toSend = new Packet(msg, seqNum, 0);
+    seqNum += msg.getMessage().length();
     nl.sendPacket(toSend, Event.RECEIVER);
-    tl.startTimer(2);
+    tl.startTimer(10);
 
     System.out.println("-------------------------");
     System.out.println(toSend);
