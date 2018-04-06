@@ -13,6 +13,13 @@ public class Packet {
   private int index;
   private boolean end;
 
+  // private boolean isCorrupt;
+  // private Message corruptMsg;
+  // private int corruptSeq;
+  // private int corruptAck;
+
+  private Packet initial;
+
   Random ran; //random number generator
 
   public Packet(Message msg, int seqnum, int acknum, int index, boolean end) {
@@ -26,14 +33,24 @@ public class Packet {
 
     this.index = index;
     this.end = end;
+
+    this.intitial = null;
   }
 
   public Packet(Packet other) {
     this.msg = new Message(new String(other.msg.getMessage()));
     this.seqnum = other.seqnum;
     this.acknum = other.acknum;
-    this.checksum = other.checksum;
+    setChecksum();
     this.ran = other.ran;
+
+    this.status = 0;
+    this.rcvwnd = 0;
+
+    this.index = other.index;
+    this.end = other.end;
+
+    this.initial = null;
   }
 
   public int getAcknum() {
@@ -69,6 +86,10 @@ public class Packet {
     return status;
   }
 
+  public Packet getInitial() {
+    return initial;
+  }
+
   public void setChecksum() {
     int cs = seqnum + acknum;
     String message = msg.getMessage();
@@ -95,6 +116,9 @@ public class Packet {
    * corrupt the ackum with 12.5% chance
    */
   public void corrupt() {
+
+    initial = new Packet(this);
+
     double num =ran.nextDouble();
 
     if(num < 0.75)

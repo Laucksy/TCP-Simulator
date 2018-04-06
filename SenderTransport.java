@@ -116,6 +116,9 @@ public class SenderTransport {
     } else if (tmp != null && acks.get(tmp.getSeqnum()) == 3) {
       if (i < packets.size() - 1) {
         tl.stopTimer();
+        System.out.println(" ----------------------------------------------------------------------- ");
+        System.out.println("FAST RETRANSMIT");
+        System.out.println(" ----------------------------------------------------------------------- \n");
         attemptSend(packets.get(i + 1));
       }
     }
@@ -123,6 +126,8 @@ public class SenderTransport {
   }
 
   public void attemptSend (Packet packet) {
+    if (packet.getInitial() != null) packet = packet.getInitial();
+    
     if (packet.getSeqnum() + packet.getMessage().byteLength() < base + n) {
       packet.setAcknum(expectedSeqnum);
 
