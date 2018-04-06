@@ -11,6 +11,7 @@ public class Event implements Comparable<Event> {
   public static int MESSAGEARRIVE = 1;
   public static int TIMER = 2;
   public static int KILLEDTIMER = 3;
+  public static int RECVREQ = 4;
   public static int SENDER = 0;
   public static int RECEIVER = 1;
 

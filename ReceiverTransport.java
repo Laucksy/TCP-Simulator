@@ -84,7 +84,7 @@ public class ReceiverTransport {
 
   public void popBuffer() {
     sortBuffer();
-    ra.receiveMessage(buffer.remove(0).getMessage());
+    if (buffer.size() > 0) ra.receiveMessage(buffer.remove(0).getMessage());
   }
 
   public void setProtocol(int n) {

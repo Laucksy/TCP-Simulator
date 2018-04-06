@@ -43,7 +43,7 @@ public class NetworkSimulator {
     DEBUG = Integer.parseInt(args[7]);
     //this loop will run while there are events in the priority queue
     ArrayList<Integer> timestamps = new ArrayList<Integer>();
-    
+
     while(true) {
       //get next event
       currentEvent = tl.returnNextEvent();
@@ -55,13 +55,12 @@ public class NetworkSimulator {
         System.out.println(" ----------------------------------------------------------------------- ");
         System.out.println("|\t\t\t\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m\t\t\t\t|");
         System.out.println(" ----------------------------------------------------------------------- \n");
-        
+
         timestamps.add(currentEvent.getTime());
       }
-
       if(currentEvent.getType() == Event.MESSAGESEND) {
         //if event is time to send a message, call the send message function of the sender application.
-       
+
         sa.sendMessage();
       } else if (currentEvent.getType() == Event.MESSAGEARRIVE) {
         //if event is a message arrival
@@ -81,12 +80,15 @@ public class NetworkSimulator {
           System.out.println(" ----------------------------------------------------------------------- ");
           System.out.println("|\t\t\033[0;36mTIMER:\t\tEXPIRED / TIME = " + currentEvent.getTime() + "\033[0m\t\t\t|");
           System.out.println(" ----------------------------------------------------------------------- \n");
-         
+
         }
         tl.stopTimer();
         st.timerExpired();
       } else if (currentEvent.getType() == Event.KILLEDTIMER) {
         //do nothing if it is just a turned off timer.
+      } else if (currentEvent.getType() == Event.RECVREQ) {
+        //Pass data from reciver transport to receiver application
+        rt.popBuffer();
       } else {
         //this should not happen.
         System.out.println("Unidentified event type!");

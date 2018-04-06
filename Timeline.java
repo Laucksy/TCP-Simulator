@@ -12,6 +12,7 @@ public class Timeline {
   private Random ran; //random number generator
   private int lastArrivalTime;  //last arrival time so far
   private Event timerPointer; //pointer to currently running timer
+  private int nextRecvAppReq; //time at which receiver application will next request data from receiver transport
 
   /**
    * A constructor to initialize variables.
@@ -24,6 +25,7 @@ public class Timeline {
     timeSoFar = 0;
     sentSoFar = 1; //set to one because we send the fisrt packet right away
     lastArrivalTime = 0;
+    nextRecvAppReq = 0;
     createSendEvent();//sengin first packet
     timerPointer=null;
   }
@@ -39,6 +41,13 @@ public class Timeline {
     if(tmp.getType() == Event.MESSAGESEND && sentSoFar < totalMessagesToSend) {
       createSendEvent();
       sentSoFar++;
+    }
+    System.out.println(timeSoFar + "," + nextRecvAppReq);
+    if(timeSoFar >= nextRecvAppReq) {
+      int newRecvReq = timeSoFar + (int)(ran.nextGaussian() * 2 + 10);
+      nextRecvAppReq = Math.max(newRecvReq, nextRecvAppReq + 1);
+      System.out.println(nextRecvAppReq);
+      events.add(new Event(nextRecvAppReq, Event.RECVREQ, Event.RECEIVER));
     }
     return tmp;
   }
