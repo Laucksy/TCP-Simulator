@@ -53,12 +53,11 @@ public class ReceiverTransport {
     Packet ack = new Packet(msg, seqnum, expectedSeqnum);
     ack.setRcvwnd(maxBufferLength - buffer.size());
     seqnum += 1;
-    System.out.println(" --- \033[0;32mReceived packet\033[0m ----------------------------------------- ");
+    System.out.println(" --- \033[0;32mReceived packet\033[0m --------------------------------------------------- ");
     System.out.println(pkt);
     System.out.println(status);
     System.out.println(" ----------------------------------------------------------------------- \n");
-
-    System.out.println(" --- \033[0;32mSending ACK\033[0m --------------------------------------------- ");
+    System.out.println(" --- \033[0;32mSending ACK\033[0m ------------------------------------------------------- ");
     System.out.println(ack);
     System.out.println(" ----------------------------------------------------------------------- \n");
 
