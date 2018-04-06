@@ -8,6 +8,7 @@ public class Packet {
   private int seqnum; //packets seq. number
   private int acknum; //packet ack. number
   private int checksum; //packet checksum
+  private int status; // not usable = 0, not sent, usable = 1, sent = 2, acked=3, 
 
   Random ran; //random number generator
 
@@ -17,6 +18,7 @@ public class Packet {
     this.acknum = acknum;
     setChecksum();
     this.ran = new Random();
+    this.status = 0;
   }
 
   public Packet(Packet other) {
@@ -37,6 +39,14 @@ public class Packet {
 
   public Message getMessage() {
     return msg;
+  }
+
+  public void setStatus (int status) {
+    this.status = status;
+  }
+
+  public int getStatus () {
+    return status;
   }
 
   public void setChecksum() {
@@ -76,12 +86,12 @@ public class Packet {
   }
 
   public String toString () {
-    String output = "\033[0;33mPacket:\033[0m\n";
+    String output = "|\033[0;33mPacket:\033[0m\t\t\t\t\t\t\t\t|\n";
 
-    output += "\tSequence Number:\t" + seqnum + "\n";
-    output += "\tACK Number:\t\t" + acknum + "\n";
-    output += "\tChecksum:\t\t" + checksum + "\n";
-    output += "\tMessage:\t\t" + msg + "\n";
+    output += "|\tSequence Number:\t" + seqnum + "\t\t\t\t\t|\n";
+    output += "|\tACK Number:\t\t" + acknum + "\t\t\t\t\t|\n";
+    output += "|\tChecksum:\t\t" + checksum + "\t\t\t\t\t|\n";
+    output += "|\tMessage:\t\t" + msg + "\n";
 
     return output;
   }

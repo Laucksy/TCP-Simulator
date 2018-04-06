@@ -9,6 +9,7 @@ public class ReceiverTransport {
   private boolean bufferingPackets;
   private List<Packet> buffer;
   private int expectedSeqnum;
+  private int seqnum;
   private int lastRead;
 
   public ReceiverTransport(NetworkLayer nl) {
@@ -22,36 +23,43 @@ public class ReceiverTransport {
     this.buffer = new ArrayList<Packet>();
     this.expectedSeqnum = 0;
     this.lastRead = 0;
+    this.seqnum = 0;
   }
 
   public void receiveMessage(Packet pkt) {
     Message msg = new Message("");
-    System.out.println("-------------------------");
-    System.out.println(pkt);
+    String status = "";
 
     if (!pkt.isCorrupt() && pkt.getSeqnum() == expectedSeqnum) {
 
-      System.out.println("\033[0;32mSTATUS:\t\tGOOD\033[0m");
+      status = "|\t\033[0;32mSTATUS:\t\tGOOD\033[0m\t\t\t\t\t\t|";
 
       buffer.add(pkt);
       // ra.receiveMessage(pkt.getMessage());
       expectedSeqnum = lastReceived();
-      Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
-      nl.sendPacket(ack, Event.SENDER);
     } else if (!pkt.isCorrupt()) {
-      System.out.println("\033[0;32mSTATUS:\t\tOUT OF ORDER\033[0m");
+      status = "|\t\033[0;32mSTATUS:\t\tOUT OF ORDER\033[0m\t\t\t\t\t\t|";
       if (bufferingPackets) {
         //TODO: Add packet to buffer
         buffer.add(pkt);
       }
-      Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
-      nl.sendPacket(ack, Event.SENDER);
     } else {
-      System.out.println("\033[0;32mSTATUS:\t\tCORRUPT\033[0m");
-
-      Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
-      nl.sendPacket(ack, Event.SENDER);
+      status = "|\t\033[0;32mSTATUS:\t\tCORRUPT\033[0m\t\t\t\t\t\t|";
     }
+
+    Packet ack = new Packet(msg, seqnum, expectedSeqnum);
+    seqnum += 1;
+    System.out.println(" --- \033[0;32mReceived packet\033[0m ----------------------------------------- ");
+    System.out.println(pkt);
+    System.out.println(status);
+    System.out.println(" ----------------------------------------------------------------------- \n");
+    
+    System.out.println(" --- \033[0;32mSending ACK\033[0m --------------------------------------------- ");
+    System.out.println(ack);
+    System.out.println(" ----------------------------------------------------------------------- \n");
+    
+    nl.sendPacket(ack, Event.SENDER);
+  
   }
 
   public void sortBuffer() {
@@ -68,7 +76,7 @@ public class ReceiverTransport {
     int lastRcvd = expectedSeqnum;
     int index = 0;
     while (index < buffer.size() && lastRcvd == buffer.get(index).getSeqnum()) {
-      lastRcvd += buffer.get(index).getMessage().length();
+      lastRcvd += buffer.get(index).getMessage().byteLength();
       index++;
     }
     return lastRcvd;
