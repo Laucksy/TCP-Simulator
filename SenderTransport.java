@@ -117,5 +117,19 @@ public class SenderTransport {
       bufferingPackets = false;
   }
 
+  public void showWindow () {
+    String output = " ------------------------------- WINDOW ------------------------------- \n";
+    output += "|\t\t\t\t\t\t\t|";
+    output += "|\t\t|";
+
+    String acked = "",
+           sent = "",
+           usable = "",
+           unusable = "";
+    for (int i = 0; i < 2; i++) {
+      
+    }
+  }
+
   
 }
