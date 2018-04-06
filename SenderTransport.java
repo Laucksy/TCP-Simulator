@@ -61,7 +61,7 @@ public class SenderTransport {
 
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
-      acks.replace(pkt.getAcknum(), acks.get(pkt.getAcknum()) + 1);
+      // acks.replace(pkt.getAcknum(), acks.get(pkt.getAcknum()) + 1);
 
       Packet tmp;
       for (int i = 0; i < packets.size(); i++) { 
