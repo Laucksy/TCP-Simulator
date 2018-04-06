@@ -133,6 +133,13 @@ public class SenderTransport {
   }
 
   public void timerExpired() {
+    for (int i = 0; i < packets.size(); i++) {
+      if (packets.get(i).getStatus() == 2) {
+        attemptSend(packets.get(i));
+        tl.startTimer(10);
+        break;
+      }
+    }
   }
 
   public void setTimeLine(Timeline tl) {
