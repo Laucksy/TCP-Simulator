@@ -18,6 +18,8 @@ public class SenderTransport {
   private HashMap<Integer, Integer> acks;
   private int base;
 
+  private int numOfPackets;
+
   public SenderTransport(NetworkLayer nl) {
     this.nl = nl;
     initialize();
@@ -32,6 +34,8 @@ public class SenderTransport {
     this.packets = new ArrayList<Packet>();
     this.base = 0;
     this.acks = new HashMap<Integer, Integer>();
+
+    this.numOfPackets = 0;
   }
 
   public void sendMessage(Message msg) {
@@ -48,13 +52,16 @@ public class SenderTransport {
       System.out.println(toSend);
       System.out.println(" ----------------------------------------------------------------------- \n");
 
+
       if (seqnum + toSend.getMessage().byteLength() < base + n) toSend.setStatus(1);
-      else toSend.setStatus(0);
 
       packets.add(toSend);
       acks.put(toSend.getSeqnum(), 0);
+      System.out.println(showWindow());
+
       attemptSend(toSend);
       seqnum += (i + mss) > msg.byteLength() ? (msg.byteLength() - i) : mss;
+
     }
   }
 
@@ -98,8 +105,9 @@ public class SenderTransport {
       nl.sendPacket(packet, Event.RECEIVER);
       tl.startTimer(10);
       System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
-      System.out.println(showWindow());
       System.out.println(" ----------------------------------------------------------------------- \n");
+
+      System.out.println(showWindow());
     }
   }
 
@@ -108,7 +116,7 @@ public class SenderTransport {
     for (int i = 0; i < packets.size(); i++) {
       if (packets.get(i).getStatus() != 3) tmp = false;
     }
-    return this.packets.size() >= n && tmp;
+    return this.packets.size() >= numOfPackets && tmp;
   }
 
   public void timerExpired() {
@@ -127,7 +135,7 @@ public class SenderTransport {
   }
 
   public void setN(int n) {
-    this.n = n;
+    this.numOfPackets = n;
   }
 
   public void setProtocol(int n) {
@@ -146,15 +154,22 @@ public class SenderTransport {
 
     for (int i = 0; i < packets.size(); i++) {
       status = packets.get(i).getStatus();
+      if (base == packets.get(i).getSeqnum()) {
+        window += " \033[0;31m▓\033[0m ";
+        continue;
+      }
+
       if (status == 3) window += " \033[0;34m▓\033[0m ";
       if (status == 2) window += " \033[0;36m▓\033[0m ";
       if (status == 1) window += " \033[0;33m▓\033[0m ";
       if (status == 0) window += " \033[0;37m▓\033[0m ";
     }
 
-    output += "|\t \033[0;34m▓\033[0m - ACKED  \033[0;36m▓\033[0m - SENT  \033[0;33m▓\033[0m - IN WINDOW  \033[0;37m▓\033[0m - OUTSIDE OF WINDOW \t|\n";
+    output += "| \033[0;34m▓\033[0m - ACKED \033[0;36m▓\033[0m - SENT \033[0;33m▓\033[0m - IN WINDOW \033[0;37m▓\033[0m - OUTSIDE OF WINDOW \033[0;31m▓\033[0m - SEND BASE\t|\n";
     output += "|\t\t\t\t\t\t\t\t\t|\n";
-    output += "| " + window;
+    output += "| " + window + "\n";
+    output += " ----------------------------------------------------------------------- \n";
+
     return output;
   }
 
