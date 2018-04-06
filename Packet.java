@@ -34,7 +34,7 @@ public class Packet {
     this.index = index;
     this.end = end;
 
-    this.intitial = null;
+    this.initial = null;
   }
 
   public Packet(Packet other) {
