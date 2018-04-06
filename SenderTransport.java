@@ -69,6 +69,7 @@ public class SenderTransport {
     System.out.println(" --- \033[0;32mReceived ACK\033[0m ----------------------------------------------------- ");
     System.out.println(pkt);
     System.out.println(" ----------------------------------------------------------------------- \n");
+    
 
     Packet tmp = null;
     int i = 0;
@@ -81,12 +82,18 @@ public class SenderTransport {
       }
     }
 
+    if (i == packets.size() - 1) {
+      System.out.println("-------------- THE END --------------");
+      tl.stopTimer();
+      return;
+    }
+
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
       expectedSeqnum = pkt.getSeqnum() + 1;
 
       for (i = 0; i < packets.size(); i++) {
-        if (packets.get(i).getStatus() == 2) {
+        if (packets.get(i).getSeqnum() >= base && packets.get(i).getStatus() == 2) {
           System.out.println("####### " + packets.get(i).getSeqnum());
           tl.stopTimer();
           System.out.println(" ----------------------------------------------------------------------- ");
@@ -134,15 +141,16 @@ public class SenderTransport {
   public boolean finished() {
     boolean tmp = true;
     for (int i = 0; i < packets.size(); i++) {
-      // System.out.println("Packet " + i + ": " + packets.get(i).getSeqnum() + "," + packets.get(i).getStatus());
       if (packets.get(i).getStatus() != 3) tmp = false;
     }
     return this.packets.size() >= numOfPackets && tmp;
   }
 
   public void timerExpired() {
-    for (int i = base; i < packets.size(); i++) {
-      if (packets.get(i).getStatus() == 2) {
+    for (int i = 0; i < packets.size(); i++) {
+      if (packets.get(i).getSeqnum() < base) continue;
+
+      if (packets.get(i).getStatus() == 2 || (packets.get(i).getStatus() == 3 && acks.get(packets.get(i).getSeqnum()) >= 3 )) {
         attemptSend(packets.get(i));
         tl.startTimer(30);
         break;
