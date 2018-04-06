@@ -22,7 +22,7 @@ public class ReceiverTransport {
   public void initialize() {
     this.bufferingPackets = false;
     this.buffer = new ArrayList<Packet>();
-    this.maxBufferLength = 10;
+    this.maxBufferLength = 100;
     this.expectedSeqnum = 0;
     this.lastRead = 0;
     this.seqnum = 0;
@@ -36,16 +36,12 @@ public class ReceiverTransport {
       // If not corrupt and in order, add to buffer and set new expected seqnum
       status = "|\t\033[0;32mSTATUS:\t\t\tGOOD\033[0m\t\t\t\t\t|";
 
-      if (buffer.size() < maxBufferLength) buffer.add(pkt);
-      expectedSeqnum = lastReceived();
+      expectedSeqnum = addToBuffer(pkt);
     } else if (!pkt.isCorrupt()) {
       // If not corrupt and out of order, add to buffer
       status = "|\t\033[0;32mSTATUS:\t\t\tOUT OF ORDER\033[0m\t\t\t\t|";
       if (bufferingPackets) {
-        if (buffer.size() < maxBufferLength) {
-          System.out.println("ADDING to buffer" + pkt.getSeqnum() + "," + expectedSeqnum);
-          buffer.add(pkt);
-        }
+        addToBuffer(pkt);
       }
     } else {
       // If corrupt
@@ -54,7 +50,11 @@ public class ReceiverTransport {
 
     // Generate ACK and send it
     Packet ack = new Packet(msg, seqnum, expectedSeqnum, 0, true);
-    ack.setRcvwnd(maxBufferLength - buffer.size());
+    int sum = 0;
+    for (int i = 0; i < buffer.size(); i++) {
+      sum += buffer.get(i).getMessage().length();
+    }
+    ack.setRcvwnd(maxBufferLength - sum);
     seqnum += 1;
     System.out.println(" --- \033[0;32mReceived packet\033[0m --------------------------------------------------- ");
     System.out.println(pkt);
@@ -66,6 +66,19 @@ public class ReceiverTransport {
 
     nl.sendPacket(ack, Event.SENDER);
 
+  }
+
+  public int addToBuffer(Packet pkt) {
+    int sum = 0;
+    for (int i = 0; i < buffer.size(); i++) {
+      sum += buffer.get(i).getMessage().length();
+    }
+    if (sum + pkt.getMessage().length() < maxBufferLength) {
+      buffer.add(pkt);
+      return lastReceived();
+    } else {
+      return expectedSeqnum;
+    }
   }
 
   public void sortBuffer() {
