@@ -73,6 +73,7 @@ public class SenderTransport {
     System.out.println(" ----------------------------------------------------------------------- \n");
     if (pkt.isCorrupt()) return;
 
+    setWindowSize(pkt.getRcvwnd());
     
     Packet tmp = null;
     int i = 0;
@@ -153,10 +154,16 @@ public class SenderTransport {
     for (int i = 0; i < packets.size(); i++) {
       if (packets.get(i).getStatus() != 3) tmp = false;
     }
+
     return this.packets.size() >= numOfPackets && tmp;
   }
 
   public void timerExpired() {
+    if (finished()) {
+      System.out.println("-------------- THE END --------------");
+      return;
+    }
+    
     for (int i = 0; i < packets.size(); i++) {
       if (packets.get(i).getSeqnum() < base) continue;
 
