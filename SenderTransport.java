@@ -39,8 +39,8 @@ public class SenderTransport {
 
     for (int i = 0; i < msg.byteLength(); i += mss) {
       toSend = new Packet(
-        new Message(msg.getMessage().substring(i, i + mss > msg.byteLength() ? msg.byteLength() : i + mss)), 
-        seqnum, 
+        new Message(msg.getMessage().substring(i, i + mss > msg.byteLength() ? msg.byteLength() : i + mss)),
+        seqnum,
         expectedSeqnum
       );
 
@@ -64,12 +64,18 @@ public class SenderTransport {
       // acks.replace(pkt.getAcknum(), acks.get(pkt.getAcknum()) + 1);
 
       Packet tmp;
-      for (int i = 0; i < packets.size(); i++) { 
+      for (int i = 0; i < packets.size(); i++) {
+        tmp = packets.get(i);
+        if (pkt.getAcknum() == tmp.getSeqnum() + tmp.getMessage().length()) tmp.setStatus(3);
+      }
+
+      tmp = null;
+      for (int i = 0; i < packets.size(); i++) {
         tmp = packets.get(i);
         if (tmp.getSeqnum() >= base && tmp.getStatus() < 1) attemptSend(tmp);
         if (tmp.getSeqnum() >= base + n) break;
       }
-      
+
       // TODO
       // if (there are currently any not-yet-acknowledged segments)
       //   start timer
@@ -83,7 +89,7 @@ public class SenderTransport {
       System.out.println(" --- \033[0;32mSending packet\033[0m ---------------------------------------------------- ");
       System.out.println(packet);
       System.out.println(" ----------------------------------------------------------------------- \n");
-      
+
       System.out.println(" ----------------------------------------------------------------------- ");
       packet.setStatus(2);
       acks.put(packet.getSeqnum(), 0);
@@ -93,6 +99,14 @@ public class SenderTransport {
       System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
       System.out.println(" ----------------------------------------------------------------------- \n");
     }
+  }
+
+  public boolean finished() {
+    boolean tmp = true;
+    for (int i = 0; i < packets.size(); i++) {
+      if (packets.get(i).getStatus() != 3) tmp = false;
+    }
+    return this.packets.size() >= n && tmp;
   }
 
   public void timerExpired() {
@@ -110,6 +124,10 @@ public class SenderTransport {
     this.mss = m;
   }
 
+  public void setN(int n) {
+    this.n = n;
+  }
+
   public void setProtocol(int n) {
     if(n > 0)
       bufferingPackets = true;
@@ -117,5 +135,5 @@ public class SenderTransport {
       bufferingPackets = false;
   }
 
-  
+
 }
