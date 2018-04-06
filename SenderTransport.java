@@ -1,5 +1,6 @@
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A class which represents the sender transport layer
@@ -14,6 +15,7 @@ public class SenderTransport {
   private boolean bufferingPackets;
 
   private ArrayList<Packet> packets;
+  private HashMap<Integer, Integer> acks;
   private int base;
 
   public SenderTransport(NetworkLayer nl) {
@@ -29,6 +31,7 @@ public class SenderTransport {
     this.bufferingPackets = false;
     this.packets = new ArrayList<Packet>();
     this.base = 0;
+    this.acks = new HashMap<Integer, Integer>();
   }
 
   public void sendMessage(Message msg) {
@@ -40,21 +43,31 @@ public class SenderTransport {
         seqnum, 
         expectedSeqnum
       );
-      seqnum += (i + mss) > msg.byteLength() ? (msg.byteLength() - i) : mss;
-      packets.add(toSend);
 
-      System.out.println("---------- Created Packet ----------");
+      System.out.println(" --- \033[0;32mCreated packet\033[0m ---------------------------------------------------- ");
       System.out.println(toSend);
-      System.out.println("------------------------------------\n");
+      System.out.println(" ----------------------------------------------------------------------- \n");
+
+      packets.add(toSend);
+      attemptSend(toSend);
+      seqnum += (i + mss) > msg.byteLength() ? (msg.byteLength() - i) : mss;
     }
   }
 
   public void receiveMessage(Packet pkt) {
-    System.out.println("-------------------------");
+    System.out.println(" --- \033[0;32mReceived ACK\033[0m ----------------------------------------------------- ");
     System.out.println(pkt);
+    System.out.println(" ----------------------------------------------------------------------- \n");
 
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
+
+      Packet tmp;
+      for (int i = 0; i < packets.size(); i++) { 
+        tmp = packets.get(i);
+        if (tmp.getSeqnum() >= base && tmp.getStatus() < 1) attemptSend(tmp);
+        if (tmp.getSeqnum() >= base + n) break;
+      }
       
       // TODO
       // if (there are currently any not-yet-acknowledged segments)
@@ -62,35 +75,22 @@ public class SenderTransport {
     }
 
     expectedSeqnum = pkt.getSeqnum() + 1;
-
   }
 
-  public void send () {
-    Packet tmp = packets.get(packets.size() - 1);
-    int baseIndex = 0;
-    int currentIndex = 0;
+  public void attemptSend (Packet packet) {
+    if (packet.getSeqnum() < base + n) {
+      System.out.println(" ~~~ \033[0;32mSending packet\033[0m ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+      System.out.println(packet);
+      System.out.println(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+      
+      System.out.println(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+      packet.setStatus(2);
+      acks.put(packet.getSeqnum(), 1);
 
-    for (int i = 0; i < packets.length; i++) {
-      if (packets.get(i).getSeqnum() == base) {
-        baseIndex = i;
-      }
-
-      if (packets.get(i).getSeqnum() == tmp.getSeqnum()) {
-        currentIdex = i;
-      }
-    }
-
-    for (int i = currentIndex; i < baseIndex + n; i++) {
-      if (i < packets.size()) {
-        System.out.println("~~~~~~~~~ Sending Packet ~~~~~~~~~");
-        System.out.println(packets.get(i));
-
-        packets.get(i).setStatus(2);
-        nl.sendPacket(packets.get(i), Event.RECEIVER);
-        tl.startTimer(10);
-        System.out.println("\033[0;37mSEND BASE:\t" + base + "\033[0m");
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-      }
+      nl.sendPacket(packet, Event.RECEIVER);
+      tl.startTimer(10);
+      System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
+      System.out.println(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n");
     }
   }
 
