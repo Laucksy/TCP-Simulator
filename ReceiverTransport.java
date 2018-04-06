@@ -34,20 +34,20 @@ public class ReceiverTransport {
 
     if (!pkt.isCorrupt() && pkt.getSeqnum() == expectedSeqnum) {
 
-      status = "|\t\033[0;32mSTATUS:\t\tGOOD\033[0m\t\t\t\t\t\t|";
+      status = "|\t\033[0;32mSTATUS:\t\t\tGOOD\033[0m\t\t\t\t\t|";
 
       if (buffer.size() < maxBufferLength) buffer.add(pkt);
       // System.out.println("ADDED TO BUFFERRRRR");
       // ra.receiveMessage(pkt.getMessage());
       expectedSeqnum = lastReceived();
     } else if (!pkt.isCorrupt()) {
-      status = "|\t\033[0;32mSTATUS:\t\tOUT OF ORDER\033[0m\t\t\t\t\t\t|";
+      status = "|\t\033[0;32mSTATUS:\t\t\tOUT OF ORDER\033[0m\t\t\t\t|";
       if (bufferingPackets) {
         //TODO: Add packet to buffer
         if (buffer.size() < maxBufferLength) buffer.add(pkt);
       }
     } else {
-      status = "|\t\033[0;32mSTATUS:\t\tCORRUPT\033[0m\t\t\t\t\t\t|";
+      status = "|\t\033[0;32mSTATUS:\t\t\tCORRUPT\033[0m\t\t\t\t\t|";
     }
 
     Packet ack = new Packet(msg, seqnum, expectedSeqnum);

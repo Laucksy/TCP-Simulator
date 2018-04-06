@@ -83,10 +83,14 @@ public class SenderTransport {
 
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
+      expectedSeqnum = pkt.getSeqnum() + 1;
 
       for (i = 0; i < packets.size(); i++) {
         if (packets.get(i).getStatus() == 2) {
-          tl.startTimer(10);
+          tl.stopTimer();
+          System.out.println(" ----------------------------------------------------------------------- ");
+          tl.startTimer(30);
+          System.out.println(" ----------------------------------------------------------------------- \n");
           break;
         }
       }
@@ -102,11 +106,12 @@ public class SenderTransport {
       attemptSend(packets.get(i + 1));
     }
 
-    expectedSeqnum = pkt.getSeqnum() + 1;
   }
 
   public void attemptSend (Packet packet) {
-    if (packet.getSeqnum() < base + n) {
+    if (packet.getSeqnum() + packet.getMessage().byteLength() < base + n) {
+      packet.setAcknum(expectedSeqnum);
+
       System.out.println(" --- \033[0;32mSending packet\033[0m ---------------------------------------------------- ");
       System.out.println(packet);
       System.out.println(" ----------------------------------------------------------------------- \n");
@@ -115,7 +120,7 @@ public class SenderTransport {
       packet.setStatus(2);
 
       nl.sendPacket(packet, Event.RECEIVER);
-      tl.startTimer(10);
+      tl.startTimer(30);
       System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
       System.out.println(" ----------------------------------------------------------------------- \n");
 
@@ -136,7 +141,7 @@ public class SenderTransport {
     for (int i = 0; i < packets.size(); i++) {
       if (packets.get(i).getStatus() == 2) {
         attemptSend(packets.get(i));
-        tl.startTimer(10);
+        tl.startTimer(30);
         break;
       }
     }
