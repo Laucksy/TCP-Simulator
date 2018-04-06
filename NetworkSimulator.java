@@ -14,13 +14,15 @@ public class NetworkSimulator {
    * @param args[5] mss
    * @param args[6] Protocol (buffering or nno buffering of out of order packets)
    * @param args[7] Debugging flag
+   * @param args[8] max receiver buffer size in bytes
+   * @param args[9] timeout length
    */
   public static void main(String[] args) {
     //current event to process
     Event currentEvent;
     //checking to see if enough arguments have been sent
-    if(args.length < 7) {
-      System.out.println("need at least 5 arguments");
+    if(args.length < 9) {
+      System.out.println("need at least 9 arguments");
       System.exit(1);
     }
     //reading in file line by line. Each line will be one message
@@ -42,6 +44,9 @@ public class NetworkSimulator {
     st.setProtocol(Integer.parseInt(args[6]));
     rt.setProtocol(Integer.parseInt(args[6]));
     DEBUG = Integer.parseInt(args[7]);
+
+    rt.setBufferSize(Integer.parseInt(args[8]));
+    st.setTimeout(Integer.parseInt(args[9]));
     //this loop will run while there are events in the priority queue
     ArrayList<Integer> timestamps = new ArrayList<Integer>();
 

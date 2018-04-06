@@ -13,6 +13,7 @@ public class SenderTransport {
   private int seqnum;
   private int expectedSeqnum;
   private boolean bufferingPackets;
+  private int timeout;
 
   private ArrayList<Packet> packets;
   private HashMap<Integer, Integer> acks;
@@ -29,6 +30,7 @@ public class SenderTransport {
     this.n = 10;
     this.mss = 10;
     this.seqnum = 0;
+    this.timeout = 30;
     this.expectedSeqnum = 0;
     this.bufferingPackets = false;
     this.packets = new ArrayList<Packet>();
@@ -73,7 +75,7 @@ public class SenderTransport {
     System.out.println(" ----------------------------------------------------------------------- \n");
     if (pkt.isCorrupt()) return;
 
-    
+
     Packet tmp = null;
     int i = 0;
     for (i = 0; i < packets.size(); i++) {
@@ -95,14 +97,14 @@ public class SenderTransport {
       expectedSeqnum = pkt.getSeqnum() + 1;
 
       for (i = 0; i < packets.size(); i++) {
-        if (packets.get(i).getSeqnum() < base) 
+        if (packets.get(i).getSeqnum() < base)
           packets.get(i).setStatus(3);
 
         if (packets.get(i).getSeqnum() >= base && packets.get(i).getStatus() == 2) {
           System.out.println("####### " + packets.get(i).getSeqnum());
           tl.stopTimer();
           System.out.println(" ----------------------------------------------------------------------- ");
-          tl.startTimer(30);
+          tl.startTimer(timeout);
           System.out.println(" ----------------------------------------------------------------------- \n");
           break;
         }
@@ -140,7 +142,7 @@ public class SenderTransport {
       packet.setStatus(2);
 
       nl.sendPacket(packet, Event.RECEIVER);
-      tl.startTimer(30);
+      tl.startTimer(timeout);
       System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
       System.out.println(" ----------------------------------------------------------------------- \n");
 
@@ -162,7 +164,7 @@ public class SenderTransport {
 
       if (packets.get(i).getStatus() == 2 || (packets.get(i).getStatus() == 3 && acks.get(packets.get(i).getSeqnum()) >= 3 )) {
         attemptSend(packets.get(i));
-        tl.startTimer(30);
+        tl.startTimer(timeout);
         break;
       }
     }
@@ -182,6 +184,10 @@ public class SenderTransport {
 
   public void setN(int n) {
     this.numOfPackets = n;
+  }
+
+  public void setTimeout(int t) {
+    this.timeout = t;
   }
 
   public void setProtocol(int n) {
@@ -223,5 +229,5 @@ public class SenderTransport {
     return output;
   }
 
-  
+
 }
