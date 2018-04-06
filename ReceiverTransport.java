@@ -115,6 +115,10 @@ public class ReceiverTransport {
     }
   }
 
+  public void setBufferSize(int n) {
+    maxBufferLength = n;
+  }
+
   public void setProtocol(int n) {
     if(n > 0)
         bufferingPackets = true;
