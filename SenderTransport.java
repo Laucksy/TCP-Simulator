@@ -89,7 +89,7 @@ public class SenderTransport {
       return;
     }
 
-    if (pkt.getAcknum() > base) {
+    if (!pkt.isCorrupt() && pkt.getAcknum() > base) {
       base = pkt.getAcknum();
       expectedSeqnum = pkt.getSeqnum() + 1;
 
@@ -127,7 +127,7 @@ public class SenderTransport {
 
   public void attemptSend (Packet packet) {
     if (packet.getInitial() != null) packet = packet.getInitial();
-    
+
     if (packet.getSeqnum() + packet.getMessage().byteLength() < base + n) {
       packet.setAcknum(expectedSeqnum);
 
