@@ -48,7 +48,11 @@ public class SenderTransport {
       System.out.println(toSend);
       System.out.println(" ----------------------------------------------------------------------- \n");
 
+      if (seqnum + toSend.getMessage().byteLength() < base + n) toSend.setStatus(1);
+      else toSend.setStatus(0);
+
       packets.add(toSend);
+      acks.put(toSend.getSeqnum(), 0);
       attemptSend(toSend);
       seqnum += (i + mss) > msg.byteLength() ? (msg.byteLength() - i) : mss;
     }
@@ -61,12 +65,14 @@ public class SenderTransport {
 
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
-      // acks.replace(pkt.getAcknum(), acks.get(pkt.getAcknum()) + 1);
 
       Packet tmp;
       for (int i = 0; i < packets.size(); i++) {
         tmp = packets.get(i);
-        if (pkt.getAcknum() == tmp.getSeqnum() + tmp.getMessage().length()) tmp.setStatus(3);
+        if (pkt.getAcknum() == tmp.getSeqnum() + tmp.getMessage().length()) {
+          tmp.setStatus(3);
+          acks.replace(tmp.getSeqnum(), acks.get(tmp.getSeqnum()) + 1);
+        }
       }
 
       tmp = null;
@@ -75,10 +81,6 @@ public class SenderTransport {
         if (tmp.getSeqnum() >= base && tmp.getStatus() < 1) attemptSend(tmp);
         if (tmp.getSeqnum() >= base + n) break;
       }
-
-      // TODO
-      // if (there are currently any not-yet-acknowledged segments)
-      //   start timer
     }
 
     expectedSeqnum = pkt.getSeqnum() + 1;
@@ -92,11 +94,11 @@ public class SenderTransport {
 
       System.out.println(" ----------------------------------------------------------------------- ");
       packet.setStatus(2);
-      acks.put(packet.getSeqnum(), 0);
 
       nl.sendPacket(packet, Event.RECEIVER);
       tl.startTimer(10);
       System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
+      System.out.println(showWindow());
       System.out.println(" ----------------------------------------------------------------------- \n");
     }
   }
@@ -135,18 +137,25 @@ public class SenderTransport {
       bufferingPackets = false;
   }
 
-  public void showWindow () {
-    String output = " ------------------------------- WINDOW ------------------------------- \n";
-    output += "|\t\t\t\t\t\t\t|";
-    output += "|\t\t|";
+  public String showWindow () {
+    String output = " ------ \033[0;32mWINDOW\033[0m ------------------------------------------------------- \n";
+    output += "|\t\t\t\t\t\t\t\t\t|\n";
 
-    String acked = "",
-           sent = "",
-           usable = "",
-           unusable = "";
-    for (int i = 0; i < 2; i++) {
-      
+    String window = "";
+    int status = 0;
+
+    for (int i = 0; i < packets.size(); i++) {
+      status = packets.get(i).getStatus();
+      if (status == 3) window += " \033[0;34m▓\033[0m ";
+      if (status == 2) window += " \033[0;36m▓\033[0m ";
+      if (status == 1) window += " \033[0;33m▓\033[0m ";
+      if (status == 0) window += " \033[0;37m▓\033[0m ";
     }
+
+    output += "|\t \033[0;34m▓\033[0m - ACKED  \033[0;36m▓\033[0m - SENT  \033[0;33m▓\033[0m - IN WINDOW  \033[0;37m▓\033[0m - OUTSIDE OF WINDOW \t|\n";
+    output += "|\t\t\t\t\t\t\t\t\t|\n";
+    output += "| " + window;
+    return output;
   }
 
   

@@ -42,11 +42,9 @@ public class Timeline {
       createSendEvent();
       sentSoFar++;
     }
-    System.out.println(timeSoFar + "," + nextRecvAppReq);
     if(timeSoFar >= nextRecvAppReq) {
       int newRecvReq = timeSoFar + (int)(ran.nextGaussian() * 2 + 10);
       nextRecvAppReq = Math.max(newRecvReq, nextRecvAppReq + 1);
-      System.out.println(nextRecvAppReq);
       events.add(new Event(nextRecvAppReq, Event.RECVREQ, Event.RECEIVER));
     }
     return tmp;
