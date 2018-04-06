@@ -8,6 +8,7 @@ public class ReceiverTransport {
   private NetworkLayer nl;
   private boolean bufferingPackets;
   private List<Packet> buffer;
+  private int maxBufferLength;
   private int expectedSeqnum;
   private int seqnum;
   private int lastRead;
@@ -21,6 +22,7 @@ public class ReceiverTransport {
   public void initialize() {
     this.bufferingPackets = false;
     this.buffer = new ArrayList<Packet>();
+    this.maxBufferLength = 10;
     this.expectedSeqnum = 0;
     this.lastRead = 0;
     this.seqnum = 0;
@@ -34,32 +36,33 @@ public class ReceiverTransport {
 
       status = "|\t\033[0;32mSTATUS:\t\tGOOD\033[0m\t\t\t\t\t\t|";
 
-      buffer.add(pkt);
+      if (buffer.size() < maxBufferLength) buffer.add(pkt);
+      // System.out.println("ADDED TO BUFFERRRRR");
       // ra.receiveMessage(pkt.getMessage());
       expectedSeqnum = lastReceived();
     } else if (!pkt.isCorrupt()) {
       status = "|\t\033[0;32mSTATUS:\t\tOUT OF ORDER\033[0m\t\t\t\t\t\t|";
       if (bufferingPackets) {
         //TODO: Add packet to buffer
-        buffer.add(pkt);
+        if (buffer.size() < maxBufferLength) buffer.add(pkt);
       }
     } else {
       status = "|\t\033[0;32mSTATUS:\t\tCORRUPT\033[0m\t\t\t\t\t\t|";
     }
 
     Packet ack = new Packet(msg, seqnum, expectedSeqnum);
+    ack.setRcvwnd(maxBufferLength - buffer.size());
     seqnum += 1;
     System.out.println(" --- \033[0;32mReceived packet\033[0m --------------------------------------------------- ");
     System.out.println(pkt);
     System.out.println(status);
     System.out.println(" ----------------------------------------------------------------------- \n");
-    
     System.out.println(" --- \033[0;32mSending ACK\033[0m ------------------------------------------------------- ");
     System.out.println(ack);
     System.out.println(" ----------------------------------------------------------------------- \n");
-    
+
     nl.sendPacket(ack, Event.SENDER);
-  
+
   }
 
   public void sortBuffer() {

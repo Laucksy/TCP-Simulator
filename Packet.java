@@ -8,7 +8,8 @@ public class Packet {
   private int seqnum; //packets seq. number
   private int acknum; //packet ack. number
   private int checksum; //packet checksum
-  private int status; // not usable = 0, not sent, usable = 1, sent = 2, acked=3, 
+  private int status; // not usable = 0, not sent, usable = 1, sent = 2, acked=3,
+  private int rcvwnd;
 
   Random ran; //random number generator
 
@@ -19,6 +20,7 @@ public class Packet {
     setChecksum();
     this.ran = new Random();
     this.status = 0;
+    this.rcvwnd = 0;
   }
 
   public Packet(Packet other) {
@@ -39,6 +41,14 @@ public class Packet {
 
   public Message getMessage() {
     return msg;
+  }
+
+  public int getRcvwnd() {
+    return rcvwnd;
+  }
+
+  public void setRcvwnd(int r) {
+    this.rcvwnd = r;
   }
 
   public void setStatus (int status) {

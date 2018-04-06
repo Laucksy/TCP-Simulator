@@ -126,6 +126,7 @@ public class SenderTransport {
   public boolean finished() {
     boolean tmp = true;
     for (int i = 0; i < packets.size(); i++) {
+      // System.out.println("Packet " + i + ": " + packets.get(i).getSeqnum() + "," + packets.get(i).getStatus());
       if (packets.get(i).getStatus() != 3) tmp = false;
     }
     return this.packets.size() >= numOfPackets && tmp;
