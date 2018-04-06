@@ -10,10 +10,12 @@ public class Packet {
   private int checksum; //packet checksum
   private int status; // not usable = 0, not sent, usable = 1, sent = 2, acked=3,
   private int rcvwnd;
+  private int index;
+  private boolean end;
 
   Random ran; //random number generator
 
-  public Packet(Message msg, int seqnum, int acknum) {
+  public Packet(Message msg, int seqnum, int acknum, int index, boolean end) {
     this.msg = msg;
     this.seqnum = seqnum;
     this.acknum = acknum;
@@ -21,6 +23,9 @@ public class Packet {
     this.ran = new Random();
     this.status = 0;
     this.rcvwnd = 0;
+
+    this.index = index;
+    this.end = end;
   }
 
   public Packet(Packet other) {

@@ -50,7 +50,7 @@ public class ReceiverTransport {
       status = "|\t\033[0;32mSTATUS:\t\t\tCORRUPT\033[0m\t\t\t\t\t|";
     }
 
-    Packet ack = new Packet(msg, seqnum, expectedSeqnum);
+    Packet ack = new Packet(msg, seqnum, expectedSeqnum, 0, true);
     ack.setRcvwnd(maxBufferLength - buffer.size());
     seqnum += 1;
     System.out.println(" --- \033[0;32mReceived packet\033[0m --------------------------------------------------- ");
