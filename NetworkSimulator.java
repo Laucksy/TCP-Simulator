@@ -37,6 +37,7 @@ public class NetworkSimulator {
     //setting window size
     st.setWindowSize(Integer.parseInt(args[4]));
     st.setMSS(Integer.parseInt(args[5]));
+    st.setN(messageArray.size());
     //setting protocol type
     st.setProtocol(Integer.parseInt(args[6]));
     rt.setProtocol(Integer.parseInt(args[6]));
@@ -44,7 +45,7 @@ public class NetworkSimulator {
     //this loop will run while there are events in the priority queue
     ArrayList<Integer> timestamps = new ArrayList<Integer>();
 
-    while(true) {
+    while(!st.finished()) {
       //get next event
       currentEvent = tl.returnNextEvent();
       //if no event present, break out
