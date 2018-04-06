@@ -87,6 +87,7 @@ public class SenderTransport {
 
       for (i = 0; i < packets.size(); i++) {
         if (packets.get(i).getStatus() == 2) {
+          System.out.println("####### " + packets.get(i).getSeqnum());
           tl.stopTimer();
           System.out.println(" ----------------------------------------------------------------------- ");
           tl.startTimer(30);
@@ -98,12 +99,14 @@ public class SenderTransport {
       tmp = null;
       for (i = 0; i < packets.size(); i++) {
         tmp = packets.get(i);
-        if (tmp.getSeqnum() >= base && tmp.getStatus() < 1) attemptSend(tmp);
+        if (tmp.getSeqnum() >= base && tmp.getStatus() <= 1) attemptSend(tmp);
         if (tmp.getSeqnum() >= base + n) break;
       }
     } else if (tmp != null && acks.get(tmp.getSeqnum()) == 3) {
-      System.out.println("Time for fast retransmit");
-      attemptSend(packets.get(i + 1));
+      if (i < packets.size() - 1) {
+        tl.stopTimer();
+        attemptSend(packets.get(i + 1));
+      }
     }
 
   }
@@ -138,7 +141,7 @@ public class SenderTransport {
   }
 
   public void timerExpired() {
-    for (int i = 0; i < packets.size(); i++) {
+    for (int i = base; i < packets.size(); i++) {
       if (packets.get(i).getStatus() == 2) {
         attemptSend(packets.get(i));
         tl.startTimer(30);
@@ -171,7 +174,7 @@ public class SenderTransport {
   }
 
   public String showWindow () {
-    String output = " ------ \033[0;32mWINDOW\033[0m ------------------------------------------------------- \n";
+    String output = " ------ \033[0;32mSENDER WINDOW\033[0m ------------------------------------------------- \n";
     output += "|\t\t\t\t\t\t\t\t\t|\n";
 
     String window = "";
@@ -194,7 +197,7 @@ public class SenderTransport {
       window += " \033[0;30m▓\033[0m ";
     }
 
-    output += "| \033[0;34m▓\033[0m - ACKED \033[0;36m▓\033[0m - SENT \033[0;33m▓\033[0m - IN WINDOW \033[0;37m▓\033[0m - OUTSIDE OF WINDOW \033[0;31m▓\033[0m - SEND BASE\t|\n";
+    output += "| \033[0;34m▓\033[0m ACKED   \033[0;36m▓\033[0m SENT   \033[0;33m▓\033[0m IN WINDOW   \033[0;37m▓\033[0m OUTSIDE OF WINDOW   \033[0;31m▓\033[0m SEND BASE\t|\n";
     output += "|\t\t\t\t\t\t\t\t\t|\n";
     output += "| " + window + "\n";
     output += " ----------------------------------------------------------------------- \n";

@@ -21,6 +21,7 @@ public class Message {
   }
 
   public void corruptMessage() {
+    System.out.println("--------- CORRUPTING -------");
     if (x.length() > 1) {
       x = (char) (x.charAt(0) + 1) + x.substring(1);
     }
