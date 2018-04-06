@@ -190,6 +190,10 @@ public class SenderTransport {
       if (status == 0) window += " \033[0;37m▓\033[0m ";
     }
 
+    for (int i = packets.size(); i < 24; i++) {
+      window += " \033[0;30m▓\033[0m ";
+    }
+
     output += "| \033[0;34m▓\033[0m - ACKED \033[0;36m▓\033[0m - SENT \033[0;33m▓\033[0m - IN WINDOW \033[0;37m▓\033[0m - OUTSIDE OF WINDOW \033[0;31m▓\033[0m - SEND BASE\t|\n";
     output += "|\t\t\t\t\t\t\t\t\t|\n";
     output += "| " + window + "\n";

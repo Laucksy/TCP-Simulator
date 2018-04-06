@@ -37,6 +37,7 @@ public class Packet {
 
   public void setAcknum (int acknum) {
     this.acknum = acknum;
+    setChecksum();
   }
 
   public int getSeqnum() {
