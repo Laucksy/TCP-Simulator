@@ -82,9 +82,8 @@ public class SenderTransport {
       }
     }
 
-    if (i == packets.size() - 1) {
+    if (finished()) {
       System.out.println("-------------- THE END --------------");
-      tl.stopTimer();
       return;
     }
 
@@ -93,6 +92,9 @@ public class SenderTransport {
       expectedSeqnum = pkt.getSeqnum() + 1;
 
       for (i = 0; i < packets.size(); i++) {
+        if (packets.get(i).getSeqnum() < base) 
+          packets.get(i).setStatus(3);
+
         if (packets.get(i).getSeqnum() >= base && packets.get(i).getStatus() == 2) {
           System.out.println("####### " + packets.get(i).getSeqnum());
           tl.stopTimer();
