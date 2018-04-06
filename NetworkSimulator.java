@@ -49,6 +49,7 @@ public class NetworkSimulator {
       if(currentEvent == null)
           break;
 
+      System.out.println(currentEvent.getType());
       if(currentEvent.getType() == Event.MESSAGESEND) {
         //if event is time to send a message, call the send message function of the sender application.
         sa.sendMessage();
@@ -86,6 +87,9 @@ public class NetworkSimulator {
         st.timerExpired();
       } else if (currentEvent.getType() == Event.KILLEDTIMER) {
         //do nothing if it is just a turned off timer.
+      } else if (currentEvent.getType() == Event.RECVREQ) {
+        //Pass data from reciver transport to receiver application
+        rt.popBuffer();
       } else {
         //this should not happen.
         System.out.println("Unidentified event type!");
