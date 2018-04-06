@@ -9,9 +9,9 @@ public class ReceiverTransport {
   private boolean bufferingPackets;
   private List<Packet> buffer;
   private int maxBufferLength;
-  private int expectedSeqnum;
+  private int expectedSeqnum; //next seqnum to be received by transport layer
   private int seqnum;
-  private int lastRead;
+  private int lastRead; //next seqnum to be drawn by application layer
 
   public ReceiverTransport(NetworkLayer nl) {
     ra = new ReceiverApplication();
@@ -33,23 +33,26 @@ public class ReceiverTransport {
     String status = "";
 
     if (!pkt.isCorrupt() && pkt.getSeqnum() == expectedSeqnum) {
-
+      // If not corrupt and in order, add to buffer and set new expected seqnum
       status = "|\t\033[0;32mSTATUS:\t\t\tGOOD\033[0m\t\t\t\t\t|";
 
       if (buffer.size() < maxBufferLength) buffer.add(pkt);
-      // System.out.println("ADDED TO BUFFERRRRR");
-      // ra.receiveMessage(pkt.getMessage());
       expectedSeqnum = lastReceived();
     } else if (!pkt.isCorrupt()) {
+      // If not corrupt and out of order, add to buffer
       status = "|\t\033[0;32mSTATUS:\t\t\tOUT OF ORDER\033[0m\t\t\t\t|";
       if (bufferingPackets) {
-        //TODO: Add packet to buffer
-        if (buffer.size() < maxBufferLength) buffer.add(pkt);
+        if (buffer.size() < maxBufferLength) {
+          System.out.println("ADDING to buffer" + pkt.getSeqnum() + "," + expectedSeqnum);
+          buffer.add(pkt);
+        }
       }
     } else {
+      // If corrupt
       status = "|\t\033[0;32mSTATUS:\t\t\tCORRUPT\033[0m\t\t\t\t\t|";
     }
 
+    // Generate ACK and send it
     Packet ack = new Packet(msg, seqnum, expectedSeqnum);
     ack.setRcvwnd(maxBufferLength - buffer.size());
     seqnum += 1;
@@ -69,7 +72,7 @@ public class ReceiverTransport {
     Collections.sort(buffer, new Comparator<Packet>() {
       @Override
       public int compare(Packet p1, Packet p2) {
-        return p2.getSeqnum() - p1.getSeqnum();
+        return p1.getSeqnum() - p2.getSeqnum();
       }
     });
   }
@@ -78,6 +81,11 @@ public class ReceiverTransport {
     sortBuffer();
     int lastRcvd = expectedSeqnum;
     int index = 0;
+    System.out.println("LastReceived," + expectedSeqnum);
+    for (int i = 0; i < buffer.size(); i++) {
+      System.out.println("Buffer " + i + ": " + buffer.get(i).getSeqnum());
+    }
+    while (index < buffer.size() && lastRcvd > buffer.get(index).getSeqnum()) index++;
     while (index < buffer.size() && lastRcvd == buffer.get(index).getSeqnum()) {
       lastRcvd += buffer.get(index).getMessage().byteLength();
       index++;
@@ -87,7 +95,11 @@ public class ReceiverTransport {
 
   public void popBuffer() {
     sortBuffer();
-    if (buffer.size() > 0) ra.receiveMessage(buffer.remove(0).getMessage());
+    if (buffer.size() > 0 && buffer.get(0).getSeqnum() == lastRead) {
+      System.out.println("POPPING FROM BUFFER");
+      lastRead += buffer.get(0).getMessage().length();
+      ra.receiveMessage(buffer.remove(0).getMessage());
+    }
   }
 
   public void setProtocol(int n) {
