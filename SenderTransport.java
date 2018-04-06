@@ -70,24 +70,36 @@ public class SenderTransport {
     System.out.println(pkt);
     System.out.println(" ----------------------------------------------------------------------- \n");
 
+    Packet tmp = null;
+    int i = 0;
+    for (i = 0; i < packets.size(); i++) {
+      tmp = packets.get(i);
+      if (pkt.getAcknum() == tmp.getSeqnum() + tmp.getMessage().length()) {
+        tmp.setStatus(3);
+        acks.replace(tmp.getSeqnum(), acks.get(tmp.getSeqnum()) + 1);
+        break;
+      }
+    }
+
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
 
-      Packet tmp;
-      for (int i = 0; i < packets.size(); i++) {
-        tmp = packets.get(i);
-        if (pkt.getAcknum() == tmp.getSeqnum() + tmp.getMessage().length()) {
-          tmp.setStatus(3);
-          acks.replace(tmp.getSeqnum(), acks.get(tmp.getSeqnum()) + 1);
+      for (i = 0; i < packets.size(); i++) {
+        if (packets.get(i).getStatus() == 2) {
+          tl.startTimer(10);
+          break;
         }
       }
 
       tmp = null;
-      for (int i = 0; i < packets.size(); i++) {
+      for (i = 0; i < packets.size(); i++) {
         tmp = packets.get(i);
         if (tmp.getSeqnum() >= base && tmp.getStatus() < 1) attemptSend(tmp);
         if (tmp.getSeqnum() >= base + n) break;
       }
+    } else if (tmp != null && acks.get(tmp.getSeqnum()) == 3) {
+      System.out.println("Time for fast retransmit");
+      attemptSend(packets.get(i + 1));
     }
 
     expectedSeqnum = pkt.getSeqnum() + 1;
