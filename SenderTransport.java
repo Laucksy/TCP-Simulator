@@ -61,6 +61,7 @@ public class SenderTransport {
 
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
+      acks.replace(pkt.getAcknum(), acks.get(pkt.getAcknum()) + 1);
 
       Packet tmp;
       for (int i = 0; i < packets.size(); i++) { 
@@ -79,18 +80,18 @@ public class SenderTransport {
 
   public void attemptSend (Packet packet) {
     if (packet.getSeqnum() < base + n) {
-      System.out.println(" ~~~ \033[0;32mSending packet\033[0m ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+      System.out.println(" --- \033[0;32mSending packet\033[0m ---------------------------------------------------- ");
       System.out.println(packet);
-      System.out.println(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+      System.out.println(" ----------------------------------------------------------------------- \n");
       
-      System.out.println(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ");
+      System.out.println(" ----------------------------------------------------------------------- ");
       packet.setStatus(2);
-      acks.put(packet.getSeqnum(), 1);
+      acks.put(packet.getSeqnum(), 0);
 
       nl.sendPacket(packet, Event.RECEIVER);
       tl.startTimer(10);
       System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
-      System.out.println(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n");
+      System.out.println(" ----------------------------------------------------------------------- \n");
     }
   }
 
@@ -115,4 +116,6 @@ public class SenderTransport {
     else
       bufferingPackets = false;
   }
+
+  
 }

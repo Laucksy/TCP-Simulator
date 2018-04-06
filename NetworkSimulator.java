@@ -42,6 +42,8 @@ public class NetworkSimulator {
     rt.setProtocol(Integer.parseInt(args[6]));
     DEBUG = Integer.parseInt(args[7]);
     //this loop will run while there are events in the priority queue
+    ArrayList<Integer> timestamps = new ArrayList<Integer>();
+    
     while(true) {
       //get next event
       currentEvent = tl.returnNextEvent();
@@ -49,35 +51,29 @@ public class NetworkSimulator {
       if(currentEvent == null)
           break;
 
+      if(DEBUG > 0 && (timestamps.size() == 0 || timestamps.get(timestamps.size() - 1) != currentEvent.getTime())) {
+        System.out.println(" ----------------------------------------------------------------------- ");
+        System.out.println("|\t\t\t\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m\t\t\t\t|");
+        System.out.println(" ----------------------------------------------------------------------- \n");
+        
+        timestamps.add(currentEvent.getTime());
+      }
+
       if(currentEvent.getType() == Event.MESSAGESEND) {
         //if event is time to send a message, call the send message function of the sender application.
-        if(DEBUG > 0) {
-          System.out.println(" ----------------------------------------------------------------------- ");
-          System.out.println("|\t\t\t\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m\t\t\t\t|");
-          System.out.println(" ----------------------------------------------------------------------- \n");
-        }
+       
         sa.sendMessage();
       } else if (currentEvent.getType() == Event.MESSAGEARRIVE) {
         //if event is a message arrival
         if(currentEvent.getHost() == Event.SENDER) {
           //if it arrives at the sender, call the get packet from the sender
-          if(DEBUG > 0) {
-            System.out.println(" ----------------------------------------------------------------------- ");
-            System.out.println("|\t\t\t\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m\t\t\t\t|");
-            System.out.println(" ----------------------------------------------------------------------- \n");
-          }
 
           st.receiveMessage(currentEvent.getPacket());
         }
         else {
           //if it arrives at the receiver, call the get packet from the receiver
-          rt.receiveMessage(currentEvent.getPacket());
 
-          if(DEBUG > 0) {
-            System.out.println("|\t\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m\t\t\t\t\t\t|");
-            // System.out.println("|\t\033[0;43m\033[30mACTION\t\tSender => Receiver (at receiver)\033[0m\t\t|");
-            System.out.println(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n");
-          }
+          rt.receiveMessage(currentEvent.getPacket());
         }
       } else if (currentEvent.getType()==Event.TIMER) {
         //If event is an expired timer, call the timerExpired method in the sender transport.
