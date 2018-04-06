@@ -49,8 +49,9 @@ public class NetworkSimulator {
       //get next event
       currentEvent = tl.returnNextEvent();
       //if no event present, break out
-      if(currentEvent == null || currentEvent.getTime() >= 500)
-          break;
+      if(currentEvent == null) break;
+      // || currentEvent.getTime() >= 500)
+      //     break;
 
       if(DEBUG > 0 && (timestamps.size() == 0 || timestamps.get(timestamps.size() - 1) != currentEvent.getTime())) {
         System.out.println(" ----------------------------------------------------------------------- ");

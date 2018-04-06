@@ -71,8 +71,9 @@ public class SenderTransport {
     System.out.println(" --- \033[0;32mReceived ACK\033[0m ----------------------------------------------------- ");
     System.out.println(pkt);
     System.out.println(" ----------------------------------------------------------------------- \n");
-    
+    if (pkt.isCorrupt()) return;
 
+    
     Packet tmp = null;
     int i = 0;
     for (i = 0; i < packets.size(); i++) {
@@ -89,7 +90,7 @@ public class SenderTransport {
       return;
     }
 
-    if (!pkt.isCorrupt() && pkt.getAcknum() > base) {
+    if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
       expectedSeqnum = pkt.getSeqnum() + 1;
 
@@ -126,7 +127,7 @@ public class SenderTransport {
   }
 
   public void attemptSend (Packet packet) {
-    if (packet.getInitial() != null) packet = packet.getInitial();
+    if (packet.getInitial() != null) packet = new Packet(packet.getInitial());
 
     if (packet.getSeqnum() + packet.getMessage().byteLength() < base + n) {
       packet.setAcknum(expectedSeqnum);
