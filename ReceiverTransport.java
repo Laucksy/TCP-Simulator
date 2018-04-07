@@ -105,10 +105,6 @@ public class ReceiverTransport {
     sortBuffer();
     int lastRcvd = expectedSeqnum;
     int index = 0;
-    System.out.println("LastReceived," + expectedSeqnum);
-    for (int i = 0; i < buffer.size(); i++) {
-      System.out.println("Buffer " + i + ": " + buffer.get(i).getSeqnum());
-    }
     while (index < buffer.size() && lastRcvd > buffer.get(index).getSeqnum()) index++;
     while (index < buffer.size() && lastRcvd == buffer.get(index).getSeqnum()) {
       lastRcvd += buffer.get(index).getMessage().byteLength();
