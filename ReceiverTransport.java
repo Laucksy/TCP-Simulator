@@ -77,11 +77,14 @@ public class ReceiverTransport {
   */
   public int addToBuffer(Packet pkt) {
     if (pkt.getSeqnum() < lastRead) return expectedSeqnum;
+<<<<<<< HEAD
+=======
 
     System.out.println("Buffer " + buffer.size());
     for (int i = 0; i < buffer.size(); i++) {
       System.out.println(buffer.get(i).getSeqnum());
     }
+>>>>>>> 4bb79697e2a3d11abf67f83eda36cbd84bc45fac
 
     int sum = 0;
     boolean found = false;
@@ -142,13 +145,9 @@ public class ReceiverTransport {
     sortBuffer();
     // Only send most recent in order packet
     if (buffer.size() > 0 && buffer.get(0).getSeqnum() == lastRead) {
-      System.out.println("POPPING FROM BUFFER " + buffer.size());
-
       lastRead += buffer.get(0).getMessage().length();
       // Send packet to application layer
       ra.receiveMessage(buffer.remove(0).getMessage());
-      System.out.println("BUFFER SIZE " + buffer.size());
-
     }
   }
 
