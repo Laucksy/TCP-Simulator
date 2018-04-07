@@ -1,0 +1,20 @@
+#BlueJ class context
+comment0.target=ReceiverTransport
+comment0.text=\n\ A\ class\ which\ represents\ the\ receiver\ transport\ layer\n
+comment1.params=nl
+comment1.target=ReceiverTransport(NetworkLayer)
+comment2.params=
+comment2.target=void\ initialize()
+comment3.params=pkt
+comment3.target=void\ receiveMessage(Packet)
+comment4.params=
+comment4.target=void\ sortBuffer()
+comment5.params=p1\ p2
+comment5.target=int\ compare(Packet,\ Packet)
+comment6.params=
+comment6.target=int\ lastReceived()
+comment7.params=
+comment7.target=void\ popBuffer()
+comment8.params=n
+comment8.target=void\ setProtocol(int)
+numComments=9

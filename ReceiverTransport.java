@@ -118,7 +118,6 @@ public class ReceiverTransport {
   public void popBuffer() {
     sortBuffer();
     if (buffer.size() > 0 && buffer.get(0).getSeqnum() == lastRead) {
-      System.out.println("POPPING FROM BUFFER");
       lastRead += buffer.get(0).getMessage().length();
       ra.receiveMessage(buffer.remove(0).getMessage());
     }

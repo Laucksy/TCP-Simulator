@@ -106,7 +106,6 @@ public class SenderTransport {
           packets.get(i).setStatus(3);
 
         if (packets.get(i).getSeqnum() >= base && packets.get(i).getStatus() == 2) {
-          if (NetworkSimulator.DEBUG >= 1) System.out.println("####### " + packets.get(i).getSeqnum());
           tl.stopTimer();
           if (NetworkSimulator.DEBUG >= 1) System.out.println(" ----------------------------------------------------------------------- ");
           tl.startTimer(timeout);
