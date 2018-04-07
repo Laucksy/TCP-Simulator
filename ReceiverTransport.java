@@ -71,11 +71,18 @@ public class ReceiverTransport {
   }
 
   public int addToBuffer(Packet pkt) {
-    int sum = 0;
+    System.out.println("Buffer " + buffer.size());
     for (int i = 0; i < buffer.size(); i++) {
+      System.out.println(buffer.get(i).getSeqnum());
+    }
+
+    int sum = 0;
+    boolean found = false;
+    for (int i = 0; i < buffer.size(); i++) {
+      if (buffer.get(i).getSeqnum() == pkt.getSeqnum()) found = true;
       sum += buffer.get(i).getMessage().length();
     }
-    if (sum + pkt.getMessage().length() < maxBufferLength) {
+    if (!found && sum + pkt.getMessage().length() < maxBufferLength) {
       buffer.add(pkt);
       return lastReceived();
     } else {

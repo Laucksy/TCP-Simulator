@@ -121,7 +121,7 @@ public class SenderTransport {
         if (tmp.getSeqnum() >= base && tmp.getStatus() <= 1) attemptSend(tmp);
         if (tmp.getSeqnum() >= base + n) break;
       }
-    } else if (tmp != null && acks.get(tmp.getSeqnum()) == 3) {
+    } else if (tmp != null && acks != null && acks.get(tmp.getSeqnum()) == 3) {
       if (i < packets.size() - 1) {
         tl.stopTimer();
         if (NetworkSimulator.DEBUG >= 2) {
@@ -138,7 +138,7 @@ public class SenderTransport {
   public void attemptSend (Packet packet) {
     if (packet.getInitial() != null) packet = new Packet(packet.getInitial());
 
-    if (packet.getSeqnum() + packet.getMessage().byteLength() < base + n) {
+    if (packet.getSeqnum() < base + n) {
       packet.setAcknum(expectedSeqnum);
 
       if (NetworkSimulator.DEBUG >= 1) {
