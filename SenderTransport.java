@@ -6,20 +6,20 @@ import java.util.HashMap;
  * A class which represents the sender transport layer
  */
 public class SenderTransport {
-  private NetworkLayer nl;
-  private Timeline tl;
-  private int n;
-  private int mss;
-  private int seqnum;
-  private int expectedSeqnum;
+  private NetworkLayer nl;  // Network Layer
+  private Timeline tl;  // Timeline
+  private int n;        // window size
+  private int mss;      // maximum segment size
+  private int seqnum;   // sequence number
+  private int expectedSeqnum; // expected sequence number - ACK's sequence number
   private boolean bufferingPackets;
-  private int timeout;
+  private int timeout;  // timeout value -> passed to the timer when it starts
 
-  private ArrayList<Packet> packets;
-  private HashMap<Integer, Integer> acks;
-  private int base;
+  private ArrayList<Packet> packets;  // list(buffer) of all the packets
+  private HashMap<Integer, Integer> acks; // list of all the acks
+  private int base; // send base for window (is a sequence number of the base packet in window)
 
-  private int numOfPackets;
+  private int numOfPackets; // 
 
   public SenderTransport(NetworkLayer nl) {
     this.nl = nl;
@@ -175,7 +175,7 @@ public class SenderTransport {
     for (int i = 0; i < packets.size(); i++) {
       if (packets.get(i).getSeqnum() < base) continue;
 
-      if (packets.get(i).getStatus() == 2 || (packets.get(i).getStatus() == 3 && acks.get(packets.get(i).getSeqnum()) >= 3 )) {
+      if (packets.get(i).getStatus() == 2 || (packets.get(i).getStatus() == 3 && acks.get(packets.get(i).getSeqnum()) >= 4 )) {
         attemptSend(packets.get(i));
         tl.startTimer(timeout);
         break;
