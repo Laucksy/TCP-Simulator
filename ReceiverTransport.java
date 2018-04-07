@@ -54,14 +54,16 @@ public class ReceiverTransport {
     }
     // Set the receiver window in the packet header
     ack.setRcvwnd(maxBufferLength - sum);
-    // Print out data about packet to the console
-    System.out.println(" --- \033[0;32mReceived packet\033[0m --------------------------------------------------- ");
-    System.out.println(pkt);
-    System.out.println(status);
-    System.out.println(" ----------------------------------------------------------------------- \n");
-    System.out.println(" --- \033[0;32mSending ACK\033[0m ------------------------------------------------------- ");
-    System.out.println(ack);
-    System.out.println(" ----------------------------------------------------------------------- \n");
+    if (NetworkSimulator.DEBUG >= 1) {
+      // Print out data about packet to the console
+      System.out.println(" --- \033[0;32mReceived packet\033[0m --------------------------------------------------- ");
+      System.out.println(pkt);
+      System.out.println(status);
+      System.out.println(" ----------------------------------------------------------------------- \n");
+      System.out.println(" --- \033[0;32mSending ACK\033[0m ------------------------------------------------------- ");
+      System.out.println(ack);
+      System.out.println(" ----------------------------------------------------------------------- \n");
+    }
 
     // Send packet through network
     nl.sendPacket(ack, Event.SENDER);

@@ -19,17 +19,14 @@ public class NetworkLayer {
   //sending packet if it is not lost, and corrupting it if necessary.
   public void sendPacket(Packet pkt, int to) {
     if(ran.nextDouble() < lossProbability) {
-      if(NetworkSimulator.DEBUG > 1)
-        System.out.println("Packet seq:" + pkt.getSeqnum() + " ack: " + pkt.getAcknum() + " lost");
+      if(NetworkSimulator.DEBUG > 1) System.out.println("Packet seq:" + pkt.getSeqnum() + " ack: " + pkt.getAcknum() + " lost");
       return;
     }
     if(ran.nextDouble() < currProbability) {
-      if(NetworkSimulator.DEBUG > 1)
-        System.out.println("Packet seq:" + pkt.getSeqnum() + " ack: " + pkt.getAcknum() + " curropted");
+      if(NetworkSimulator.DEBUG > 1) System.out.println("Packet seq:" + pkt.getSeqnum() + " ack: " + pkt.getAcknum() + " curropted");
       pkt.corrupt();
     }
-    if(NetworkSimulator.DEBUG > 1)
-      System.out.println("Packet seq:" + pkt.getSeqnum() + " ack: " + pkt.getAcknum() + " sent");
+    if(NetworkSimulator.DEBUG > 1) System.out.println("Packet seq:" + pkt.getSeqnum() + " ack: " + pkt.getAcknum() + " sent");
     tl.createArriveEvent(pkt, to);
   }
 }

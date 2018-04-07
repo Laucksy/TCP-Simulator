@@ -46,7 +46,7 @@ public class Event implements Comparable<Event> {
    */
   public void killTimer() {
     if(type != TIMER) {
-      System.out.println("Trying to stop a timer on an event that is not a timer! should not happen!");
+      if (NetworkSimulator.DEBUG > 2) System.out.println("Trying to stop a timer on an event that is not a timer! should not happen!");
       System.exit(1);
     }
     type = KILLEDTIMER;
