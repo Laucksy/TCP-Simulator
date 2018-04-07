@@ -19,13 +19,16 @@ public class SenderTransport {
   private HashMap<Integer, Integer> acks; // list of all the acks
   private int base; // send base for window (is a sequence number of the base packet in window)
 
-  private int numOfPackets; // 
+  private int numOfPackets; //  number of packets that needs to be sent in total
 
   public SenderTransport(NetworkLayer nl) {
     this.nl = nl;
     initialize();
   }
-
+  
+  /**
+   * Initialize method that initializes sender class and sets each class variable to initial value
+   */
   public void initialize() {
     this.n = 10;
     this.mss = 10;
