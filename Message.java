@@ -13,6 +13,7 @@ public class Message {
   }
 
   public int length() {
+    // Purely to prevent us from having to do packet.getMessage().getMessage().length() each time
     return x.length();
   }
 
