@@ -121,7 +121,7 @@ public class SenderTransport {
         if (tmp.getSeqnum() >= base && tmp.getStatus() <= 1) attemptSend(tmp);
         if (tmp.getSeqnum() >= base + n) break;
       }
-    } else if (tmp != null && acks != null && acks.get(tmp.getSeqnum()) == 3) {
+    } else if (tmp != null && acks.containsKey(tmp.getSeqnum()) && acks.get(tmp.getSeqnum()) == 3) {
       if (i < packets.size() - 1) {
         tl.stopTimer();
         if (NetworkSimulator.DEBUG >= 2) {
