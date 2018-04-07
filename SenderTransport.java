@@ -47,9 +47,7 @@ public class SenderTransport {
       toSend = new Packet(
         new Message(msg.getMessage().substring(i, i + mss > msg.byteLength() ? msg.byteLength() : i + mss)),
         seqnum,
-        expectedSeqnum,
-        i % mss,
-        msg.byteLength() - i <= mss ? true : false
+        expectedSeqnum
       );
 
       if (NetworkSimulator.DEBUG >= 1) {
