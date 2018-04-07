@@ -43,10 +43,18 @@ public class SenderTransport {
     this.numOfPackets = 0;
   }
 
+  /**
+   * Start Send message process once Transport Layer gets the message from application layer
+   * 
+   * @param Message msg - Message that needs to be sent 
+   */
   public void sendMessage(Message msg) {
     Packet toSend;
 
+    // if message is more than mss than start splitting it up in several segments. 
+    // each segment will have mss, or if it is the last chunk -  whatever is left from message
     for (int i = 0; i < msg.byteLength(); i += mss) {
+      // create the segment 
       toSend = new Packet(
         new Message(msg.getMessage().substring(i, i + mss > msg.byteLength() ? msg.byteLength() : i + mss)),
         seqnum,
@@ -59,52 +67,76 @@ public class SenderTransport {
         System.out.println(" ----------------------------------------------------------------------- \n");
       }
 
+      // if the packet can be moved into the window, move it
       if (seqnum + toSend.getMessage().byteLength() < base + n) toSend.setStatus(1);
 
+      // add packet to the packets list
       packets.add(toSend);
+      // set the number of acks received for this packet to 0
       acks.put(toSend.getSeqnum(), 0);
       if (NetworkSimulator.DEBUG >= 1) System.out.println(showWindow());
 
+      // attempt to send the packet to the receiver, will send if the packet is in 
+      // the window and receiver's buffer has enough space
       attemptSend(toSend);
+
+      // update sequence number that will be assigned to next packet
       seqnum += (i + mss) > msg.byteLength() ? (msg.byteLength() - i) : mss;
 
     }
   }
 
+  /**
+   * Triggers when message is received, message is usually ACK from the receiver and provdeis the ACK packet
+   * @param pkt - Packet which contains the ack
+   * 
+   */
   public void receiveMessage(Packet pkt) {
     if (NetworkSimulator.DEBUG >= 1) {
       System.out.println(" --- \033[0;32mReceived ACK\033[0m ----------------------------------------------------- ");
       System.out.println(pkt);
       System.out.println(" ----------------------------------------------------------------------- \n");
     }
+
+    // if ack is corrupt do not continue and stop following proccess
     if (pkt.isCorrupt()) return;
 
+    // update window size based on the receiver's window
     setWindowSize(pkt.getRcvwnd());
 
+    // find the packet that was acked
     Packet tmp = null;
     int i = 0;
     for (i = 0; i < packets.size(); i++) {
       tmp = packets.get(i);
       if (pkt.getAcknum() == tmp.getSeqnum() + tmp.getMessage().length()) {
+        // set status of that packet to 3 which measn it was acked
         tmp.setStatus(3);
+        // update number of acks in acks table for that packet
         acks.replace(tmp.getSeqnum(), acks.get(tmp.getSeqnum()) + 1);
         break;
       }
     }
 
+    // check if it was the last packet
     if (finished()) {
       System.out.println("-------------- THE END --------------");
       return;
     }
 
+    // if acked packets sequence number + acked packets message length is more than current window send base
+    // update window send base
     if (pkt.getAcknum() > base) {
       base = pkt.getAcknum();
+      // update expected sequence number
       expectedSeqnum = pkt.getSeqnum() + 1;
 
+      // update any packets before this and set status to 3 which means they were acked
+      // solves the situation when the ack for packet x gets lost but ack for packet x + 1 arrives successfully
       for (i = 0; i < packets.size(); i++) {
         if (packets.get(i).getSeqnum() < base)
           packets.get(i).setStatus(3);
-
+        // if any packet is sent reset the timer
         if (packets.get(i).getSeqnum() >= base && packets.get(i).getStatus() == 2) {
           tl.stopTimer();
           if (NetworkSimulator.DEBUG >= 1) System.out.println(" ----------------------------------------------------------------------- ");
@@ -115,13 +147,16 @@ public class SenderTransport {
       }
 
       tmp = null;
+      // if window has enuough space and receiver's window could also receive another packet send next one in the list
       for (i = 0; i < packets.size(); i++) {
         tmp = packets.get(i);
         if (tmp.getSeqnum() >= base && tmp.getStatus() <= 1) attemptSend(tmp);
         if (tmp.getSeqnum() >= base + n) break;
       }
     } else if (tmp != null && acks.containsKey(tmp.getSeqnum()) && acks.get(tmp.getSeqnum()) == 3) {
+      // fast retransmit if we get 3 duplicate acks for same packet
       if (i < packets.size() - 1) {
+        // stop and later restart the timer
         tl.stopTimer();
         if (NetworkSimulator.DEBUG >= 2) {
           System.out.println(" ----------------------------------------------------------------------- ");
@@ -134,9 +169,15 @@ public class SenderTransport {
 
   }
 
+  /**
+   * attempt to send the packet, will send if the packets sequence number is less than send base + window size
+   * @param packet - Packet that needs to besent
+   */
   public void attemptSend (Packet packet) {
+    // if packet was corrupted, get inital version and try to send that
     if (packet.getInitial() != null) packet = new Packet(packet.getInitial());
 
+    // start process only if recevier's window can accept next packet
     if (packet.getSeqnum() < base + n) {
       packet.setAcknum(expectedSeqnum);
 
@@ -160,6 +201,11 @@ public class SenderTransport {
     }
   }
 
+  /**
+   * check if all the packets have been acked
+   * 
+   * @return boolean - true if program is done
+   */
   public boolean finished() {
     boolean tmp = true;
     for (int i = 0; i < packets.size(); i++) {
@@ -169,12 +215,18 @@ public class SenderTransport {
     return this.packets.size() >= numOfPackets && tmp;
   }
 
+  /**
+   * handle timer when it expires
+   */
   public void timerExpired() {
+    // check if program is done
     if (finished()) {
       System.out.println("-------------- THE END --------------");
       return;
     }
 
+    // start checking packets and find which one needs to be resent,
+    // the one that comes after send base with lowest sequence number will be retransmitted
     for (int i = 0; i < packets.size(); i++) {
       if (packets.get(i).getSeqnum() < base) continue;
 
