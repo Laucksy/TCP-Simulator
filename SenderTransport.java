@@ -52,16 +52,18 @@ public class SenderTransport {
         msg.byteLength() - i <= mss ? true : false
       );
 
-      System.out.println(" --- \033[0;32mCreated packet\033[0m ---------------------------------------------------- ");
-      System.out.println(toSend);
-      System.out.println(" ----------------------------------------------------------------------- \n");
+      if (NetworkSimulator.DEBUG >= 1) {
+        System.out.println(" --- \033[0;32mCreated packet\033[0m ---------------------------------------------------- ");
+        System.out.println(toSend);
+        System.out.println(" ----------------------------------------------------------------------- \n");
+      }
 
 
       if (seqnum + toSend.getMessage().byteLength() < base + n) toSend.setStatus(1);
 
       packets.add(toSend);
       acks.put(toSend.getSeqnum(), 0);
-      System.out.println(showWindow());
+      if (NetworkSimulator.DEBUG >= 1) System.out.println(showWindow());
 
       attemptSend(toSend);
       seqnum += (i + mss) > msg.byteLength() ? (msg.byteLength() - i) : mss;
@@ -70,13 +72,15 @@ public class SenderTransport {
   }
 
   public void receiveMessage(Packet pkt) {
-    System.out.println(" --- \033[0;32mReceived ACK\033[0m ----------------------------------------------------- ");
-    System.out.println(pkt);
-    System.out.println(" ----------------------------------------------------------------------- \n");
+    if (NetworkSimulator.DEBUG >= 1) {
+      System.out.println(" --- \033[0;32mReceived ACK\033[0m ----------------------------------------------------- ");
+      System.out.println(pkt);
+      System.out.println(" ----------------------------------------------------------------------- \n");
+    }
     if (pkt.isCorrupt()) return;
 
     setWindowSize(pkt.getRcvwnd());
-    
+
     Packet tmp = null;
     int i = 0;
     for (i = 0; i < packets.size(); i++) {
@@ -102,11 +106,11 @@ public class SenderTransport {
           packets.get(i).setStatus(3);
 
         if (packets.get(i).getSeqnum() >= base && packets.get(i).getStatus() == 2) {
-          System.out.println("####### " + packets.get(i).getSeqnum());
+          if (NetworkSimulator.DEBUG >= 1) System.out.println("####### " + packets.get(i).getSeqnum());
           tl.stopTimer();
-          System.out.println(" ----------------------------------------------------------------------- ");
+          if (NetworkSimulator.DEBUG >= 1) System.out.println(" ----------------------------------------------------------------------- ");
           tl.startTimer(timeout);
-          System.out.println(" ----------------------------------------------------------------------- \n");
+          if (NetworkSimulator.DEBUG >= 1) System.out.println(" ----------------------------------------------------------------------- \n");
           break;
         }
       }
@@ -120,9 +124,11 @@ public class SenderTransport {
     } else if (tmp != null && acks.get(tmp.getSeqnum()) == 3) {
       if (i < packets.size() - 1) {
         tl.stopTimer();
-        System.out.println(" ----------------------------------------------------------------------- ");
-        System.out.println("FAST RETRANSMIT");
-        System.out.println(" ----------------------------------------------------------------------- \n");
+        if (NetworkSimulator.DEBUG >= 2) {
+          System.out.println(" ----------------------------------------------------------------------- ");
+          System.out.println("FAST RETRANSMIT");
+          System.out.println(" ----------------------------------------------------------------------- \n");
+        }
         attemptSend(packets.get(i + 1));
       }
     }
@@ -135,19 +141,23 @@ public class SenderTransport {
     if (packet.getSeqnum() + packet.getMessage().byteLength() < base + n) {
       packet.setAcknum(expectedSeqnum);
 
-      System.out.println(" --- \033[0;32mSending packet\033[0m ---------------------------------------------------- ");
-      System.out.println(packet);
-      System.out.println(" ----------------------------------------------------------------------- \n");
+      if (NetworkSimulator.DEBUG >= 1) {
+        System.out.println(" --- \033[0;32mSending packet\033[0m ---------------------------------------------------- ");
+        System.out.println(packet);
+        System.out.println(" ----------------------------------------------------------------------- \n");
 
-      System.out.println(" ----------------------------------------------------------------------- ");
+        System.out.println(" ----------------------------------------------------------------------- ");
+      }
       packet.setStatus(2);
 
       nl.sendPacket(packet, Event.RECEIVER);
       tl.startTimer(timeout);
-      System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
-      System.out.println(" ----------------------------------------------------------------------- \n");
+      if (NetworkSimulator.DEBUG >= 1) {
+        System.out.println("|\t\033[0;37mSEND BASE:\t" + base + "\033[0m\t\t\t\t\t\t|");
+        System.out.println(" ----------------------------------------------------------------------- \n");
 
-      System.out.println(showWindow());
+        System.out.println(showWindow());
+      }
     }
   }
 
@@ -165,7 +175,7 @@ public class SenderTransport {
       System.out.println("-------------- THE END --------------");
       return;
     }
-    
+
     for (int i = 0; i < packets.size(); i++) {
       if (packets.get(i).getSeqnum() < base) continue;
 

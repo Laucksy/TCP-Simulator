@@ -87,11 +87,11 @@ public class Timeline {
    */
   public void startTimer(int increment) {
     if(timerPointer != null) {
-      System.out.println("|\t\033[0;32mTIMER:\t\tON\033[0m\t\t\t\t\t\t|");
+      if (NetworkSimulator.DEBUG >= 1) System.out.println("|\t\033[0;32mTIMER:\t\tON\033[0m\t\t\t\t\t\t|");
       return;
     }
     timerPointer = new Event(timeSoFar+increment,Event.TIMER,Event.SENDER);
-    System.out.println("|\t\033[0;32mTIMER:\t\tSTARTING\033[0m\t\t\t\t\t|");
+    if (NetworkSimulator.DEBUG >= 1) System.out.println("|\t\033[0;32mTIMER:\t\tSTARTING\033[0m\t\t\t\t\t|");
 
     events.add(timerPointer);
     if(NetworkSimulator.DEBUG > 2)
@@ -103,7 +103,7 @@ public class Timeline {
    */
   public void stopTimer() {
     if(timerPointer == null) {
-      System.out.println("Timer is not on!");
+      if (NetworkSimulator.DEBUG >= 1) System.out.println("Timer is not on!");
       return;
     }
 
