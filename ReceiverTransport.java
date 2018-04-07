@@ -71,12 +71,7 @@ public class ReceiverTransport {
   }
 
   public int addToBuffer(Packet pkt) {
-    if (pkt.getSeqnum() < lastRead) return expectedSeqnum; 
-
-    System.out.println("Buffer " + buffer.size());
-    for (int i = 0; i < buffer.size(); i++) {
-      System.out.println(buffer.get(i).getSeqnum());
-    }
+    if (pkt.getSeqnum() < lastRead) return expectedSeqnum;
 
     int sum = 0;
     boolean found = false;
@@ -116,12 +111,8 @@ public class ReceiverTransport {
   public void popBuffer() {
     sortBuffer();
     if (buffer.size() > 0 && buffer.get(0).getSeqnum() == lastRead) {
-      System.out.println("POPPING FROM BUFFER " + buffer.size());
-      
       lastRead += buffer.get(0).getMessage().length();
       ra.receiveMessage(buffer.remove(0).getMessage());
-      System.out.println("BUFFER SIZE " + buffer.size());
-
     }
   }
 

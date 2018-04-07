@@ -58,7 +58,7 @@ public class SenderTransport {
         System.out.println(" ----------------------------------------------------------------------- \n");
       }
 
-      if (seqnum + toSend.getMessage().byteLength() < base + n * mss) toSend.setStatus(1);
+      if (seqnum + toSend.getMessage().byteLength() < base + n) toSend.setStatus(1);
 
       packets.add(toSend);
       acks.put(toSend.getSeqnum(), 0);
