@@ -6,11 +6,10 @@ import java.util.*;
 public class ReceiverTransport {
   private ReceiverApplication ra;
   private NetworkLayer nl;
-  private boolean bufferingPackets;
+  private boolean bufferingPackets; //whether or not ot buffer out of order packets
   private List<Packet> buffer;
-  private int maxBufferLength;
+  private int maxBufferLength; //maximum buffer length in bytes
   private int expectedSeqnum; //next seqnum to be received by transport layer
-  private int seqnum;
   private int lastRead; //next seqnum to be drawn by application layer
 
   public ReceiverTransport(NetworkLayer nl) {
@@ -25,7 +24,6 @@ public class ReceiverTransport {
     this.maxBufferLength = 100;
     this.expectedSeqnum = 0;
     this.lastRead = 0;
-    this.seqnum = 0;
   }
 
   public void receiveMessage(Packet pkt) {
@@ -49,13 +47,14 @@ public class ReceiverTransport {
     }
 
     // Generate ACK and send it
-    Packet ack = new Packet(msg, seqnum, expectedSeqnum, 0, true);
+    Packet ack = new Packet(msg, pkt.getSeqnum(), expectedSeqnum);
     int sum = 0;
     for (int i = 0; i < buffer.size(); i++) {
       sum += buffer.get(i).getMessage().length();
     }
+    // Set the receiver window in the packet header
     ack.setRcvwnd(maxBufferLength - sum);
-    seqnum += 1;
+    // Print out data about packet to the console
     System.out.println(" --- \033[0;32mReceived packet\033[0m --------------------------------------------------- ");
     System.out.println(pkt);
     System.out.println(status);
@@ -64,23 +63,34 @@ public class ReceiverTransport {
     System.out.println(ack);
     System.out.println(" ----------------------------------------------------------------------- \n");
 
+    // Send packet through network
     nl.sendPacket(ack, Event.SENDER);
 
   }
 
+  /**
+   * Add a packet to the buffer if there's space
+   * @param  Packet pkt           packet to add to buffer
+   * @return        new expected seqnum, accounting for out of order packets in buffer
+   */
   public int addToBuffer(Packet pkt) {
     int sum = 0;
     for (int i = 0; i < buffer.size(); i++) {
       sum += buffer.get(i).getMessage().length();
     }
     if (sum + pkt.getMessage().length() < maxBufferLength) {
+      // There's space in buffer
       buffer.add(pkt);
       return lastReceived();
     } else {
+      // Since nothing was added, don't return a new value
       return expectedSeqnum;
     }
   }
 
+  /**
+   * Sort the buffer by sequence number, with the lowest at the front
+   */
   public void sortBuffer() {
     Collections.sort(buffer, new Comparator<Packet>() {
       @Override
@@ -90,15 +100,22 @@ public class ReceiverTransport {
     });
   }
 
+  /**
+   * Calculates the expected sequence number
+   * IF there are no out of order packets, this will just be the current
+   *    packet sequence number plus the packet length
+   * Otherwise, it will see if any of the out of order packets are directly
+   *    after the one just received and return the new expected seqnum
+   * @return the last in order packet received
+   */
   public int lastReceived() {
+    // Makes sure the buffer is sorted before starting
     sortBuffer();
     int lastRcvd = expectedSeqnum;
     int index = 0;
-    System.out.println("LastReceived," + expectedSeqnum);
-    for (int i = 0; i < buffer.size(); i++) {
-      System.out.println("Buffer " + i + ": " + buffer.get(i).getSeqnum());
-    }
+    // Skips any previous in order packets that haven't been drawn by application layer yet
     while (index < buffer.size() && lastRcvd > buffer.get(index).getSeqnum()) index++;
+    // Calculates new expected seqnum by checking the last received packet and the next out of order packets
     while (index < buffer.size() && lastRcvd == buffer.get(index).getSeqnum()) {
       lastRcvd += buffer.get(index).getMessage().byteLength();
       index++;
@@ -106,11 +123,16 @@ public class ReceiverTransport {
     return lastRcvd;
   }
 
+  /**
+   * Pulls the most recent in order packet to deliver to application layer
+   */
   public void popBuffer() {
+    // Sorts buffer before starting
     sortBuffer();
+    // Only send most recent in order packet
     if (buffer.size() > 0 && buffer.get(0).getSeqnum() == lastRead) {
-      System.out.println("POPPING FROM BUFFER");
       lastRead += buffer.get(0).getMessage().length();
+      // Send packet to application layer
       ra.receiveMessage(buffer.remove(0).getMessage());
     }
   }

@@ -3,7 +3,6 @@
  */
 public class ReceiverApplication {
   public void receiveMessage(Message msg) {
-    // System.out.println("from receiver:" + msg.getMessage());
-    // System.out.println("POPPED FROM BUFFERRRRR");
+    System.out.println("\n\n --- \033[0;32mDrew packet from receiver Transport Layer to Application Layer\033[0m --- \n\n\n");
   }
 }

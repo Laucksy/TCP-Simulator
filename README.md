@@ -16,7 +16,7 @@ $ make compile
 Run the simulation using the following format
 
 ```bash
-$ java NetworkSimulator [file] [time-between-msgs] [loss%] [corruption%] [window] [mss] [protocol] [debug]
+$ java NetworkSimulator [file] [time-between-msgs] [loss%] [corruption%] [window] [mss] [protocol] [debug] [rcv-buffer-length] [timeout-length]
 ```
 
 ## Authors

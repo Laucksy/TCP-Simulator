@@ -10,19 +10,12 @@ public class Packet {
   private int checksum; //packet checksum
   private int status; // not usable = 0, not sent, usable = 1, sent = 2, acked=3,
   private int rcvwnd;
-  private int index;
-  private boolean end;
 
-  // private boolean isCorrupt;
-  // private Message corruptMsg;
-  // private int corruptSeq;
-  // private int corruptAck;
-
-  private Packet initial;
+  private Packet initial; //Used to store uncorrupted packet when corrupt() is called
 
   Random ran; //random number generator
 
-  public Packet(Message msg, int seqnum, int acknum, int index, boolean end) {
+  public Packet(Message msg, int seqnum, int acknum) {
     this.msg = msg;
     this.seqnum = seqnum;
     this.acknum = acknum;
@@ -30,9 +23,6 @@ public class Packet {
     this.ran = new Random();
     this.status = 0;
     this.rcvwnd = 0;
-
-    this.index = index;
-    this.end = end;
 
     this.initial = null;
   }
@@ -46,9 +36,6 @@ public class Packet {
 
     this.status = 0;
     this.rcvwnd = 0;
-
-    this.index = other.index;
-    this.end = other.end;
 
     this.initial = null;
   }
@@ -90,16 +77,23 @@ public class Packet {
     return initial;
   }
 
+  /**
+   * Sets the checksum by adding the sequence number,
+   * ack number, and message characters
+   */
   public void setChecksum() {
     int cs = seqnum + acknum;
     String message = msg.getMessage();
     for (int i = 0; i < message.length(); i++) {
       cs += message.charAt(i);
     }
-    // System.out.println("CHECKSUM: " + cs);
     this.checksum = cs;
   }
 
+  /**
+   * Recalculates the checksum and compares it to the one on the packet
+   * @return whether or not the packet checksum equals the newly calculated one
+   */
   public boolean isCorrupt() {
     int cs = seqnum + acknum;
     String message = msg.getMessage();

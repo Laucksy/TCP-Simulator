@@ -45,6 +45,7 @@ public class NetworkSimulator {
     rt.setProtocol(Integer.parseInt(args[6]));
     DEBUG = Integer.parseInt(args[7]);
 
+    //set buffer size and timeout
     rt.setBufferSize(Integer.parseInt(args[8]));
     st.setTimeout(Integer.parseInt(args[9]));
     //this loop will run while there are events in the priority queue
@@ -55,9 +56,8 @@ public class NetworkSimulator {
       currentEvent = tl.returnNextEvent();
       //if no event present, break out
       if(currentEvent == null) break;
-      // || currentEvent.getTime() >= 500)
-      //     break;
 
+      //Print out time
       if(DEBUG > 0 && (timestamps.size() == 0 || timestamps.get(timestamps.size() - 1) != currentEvent.getTime())) {
         System.out.println(" ----------------------------------------------------------------------- ");
         System.out.println("|\t\t\t\033[0;36mTIME:\t\t" + currentEvent.getTime() + "\033[0m\t\t\t\t|");
