@@ -54,11 +54,11 @@ public class SenderTransport {
 
       if (NetworkSimulator.DEBUG >= 1) {
         System.out.println(" --- \033[0;32mCreated packet\033[0m ---------------------------------------------------- ");
-        System.out.println(toSend);
+        System.out.println(toSend); 
         System.out.println(" ----------------------------------------------------------------------- \n");
       }
 
-      if (seqnum + toSend.getMessage().byteLength() < base + n * mss) toSend.setStatus(1);
+      if (seqnum + toSend.getMessage().byteLength() < base + n) toSend.setStatus(1);
 
       packets.add(toSend);
       acks.put(toSend.getSeqnum(), 0);
